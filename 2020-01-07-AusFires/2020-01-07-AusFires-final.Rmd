@@ -81,6 +81,8 @@ clean_df_city %>%
   theme(plot.title = element_text(face="bold")) +
   theme(legend.text = element_text(colour = "black")) +
   scale_x_discrete(limits=lab) 
+
+#ggsave(plot = last_plot(), filename = "aus-temp.png", dpi = 300, width = 8, height = 5)
 ```
 
 
@@ -97,13 +99,13 @@ clean_df_city %>%
   xlab("Temperature (C)") +
   ylab("Decade") +
   ggtitle("Temperature in Sydney, Australia Over Time") +
-  #theme_tufte()
   theme_solarized() +
   theme(axis.text = element_text(colour = "black")) +
   theme(title = element_text(colour = "black")) +
   theme(plot.title = element_text(face="bold")) +
   theme(legend.text = element_text(colour = "black"))
 
+#ggsave(plot = last_plot(), filename = "aus-temp-density.png", dpi = 300, width = 8, height = 5)
 ```
 
 
@@ -118,7 +120,6 @@ clean_df_city %>%
   xlab("Average Temp. (C) Each Decade") +
   ylab("Month") +
   ggtitle("Average Monthly Temperature in Sydney, Australia Over Time") +
-  #theme_tufte()
   theme_solarized() +
   theme(axis.text = element_text(colour = "black")) +
   theme(title = element_text(colour = "black")) +
@@ -129,6 +130,7 @@ clean_df_city %>%
   theme(legend.title = element_text(size = 10)) +
   scale_y_discrete(limits=lab) 
   
+#ggsave(plot = last_plot(), filename = "aus-temp-density-month.png", dpi = 300, width = 8, height = 5)
 ```
 
 
@@ -153,6 +155,8 @@ clean_df_city %>%
   theme(legend.title = element_text(size = 10)) +
   guides(fill=guide_legend(title="Decade")) +
   scale_x_discrete(limits=lab)
+
+#ggsave(plot = last_plot(), filename = "aus-temp-month.png", dpi = 300, width = 8, height = 5)
 ```
 
 
@@ -195,6 +199,7 @@ clean_df_city %>%
   theme(plot.title = element_text(face="bold", "size"=11)) +
   theme(legend.text = element_text(colour = "black")) 
 
+#ggsave(plot = last_plot(), filename = "aus-temp-density-dec_mon.png", dpi = 300, width = 8, height = 5)
 ```
 
 
@@ -217,6 +222,8 @@ clean_df_city %>%
   theme(plot.title = element_text(face="bold", "size"=13)) +
   theme(legend.text = element_text(colour = "black")) +
   guides(fill=guide_legend(title="Decade"))
+
+#ggsave(plot = last_plot(), filename = "aus-temp-freq-blocks.png", dpi = 300, width = 8, height = 5)
 ```
 
 ```{r}
@@ -233,6 +240,8 @@ clean_df_city %>%
   theme(plot.title = element_text(face="bold", "size"=13)) +
   theme(legend.text = element_text(colour = "black")) +
   guides(fill=guide_legend(title="Decade"))
+
+#ggsave(plot = last_plot(), filename = "aus-temp-freq.png", dpi = 300, width = 8, height = 5)
 ```
 
 
