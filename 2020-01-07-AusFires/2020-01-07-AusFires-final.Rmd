@@ -1,0 +1,240 @@
+---
+title: "2020-01-07-Australia_Fires"
+author: "Kristen A"
+date: "1/8/2020"
+output: html_document
+---
+
+## Sydney, Australia - Temperature Visualizations
+
+```{r, warning=F, message=F}
+library(plyr)
+library(tidyverse)
+library(lubridate)
+library(RColorBrewer)
+library(ggridges)
+library(ggthemes)
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+temperature <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-07/temperature.csv')
+```
+
+
+```{r}
+clean_df <- temperature  %>%
+  filter(temp_type=="max") %>%
+  mutate(year=lubridate::year(date)) %>%
+  mutate(month_simple=lubridate::month(date)) %>%
+  select(city_name, date, year, month_simple, temperature) %>%
+  group_by(city_name, add = TRUE) %>%
+  group_by(month=floor_date(date, "month"), add = TRUE) %>%
+  mutate(avg_mon_temp=mean(temperature)) %>%
+  ungroup() %>%
+  na.omit(.)
+
+
+x<- seq(1910, 2019, by = 10)
+
+for (year in x){
+  clean_df$decade[clean_df$year  >= year  & clean_df$year < (year+10)] <- year 
+} 
+
+```
+
+
+```{r}
+  #calculate average temperature per month by decade
+mean.temp.month.city <- function(x) {
+  x %>%
+  group_by(city_name, month_simple, add=T) %>%
+  summarise(avg_mon_temp_dec=mean(temperature)) -> x
+}
+
+clean_df_city <- ddply(clean_df, .(decade), mean.temp.month.city)
+```
+
+```{r}
+lab <- as.factor(c("Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."))
+```
+
+
+
+### Plots
+
+```{r}
+clean_df_city$decade <- factor(clean_df_city$decade)
+
+clean_df_city %>%
+  filter(city_name=="SYDNEY") %>%
+  filter(decade==1960| decade==2010) %>%
+  ggplot(., aes(x=month_simple, y=avg_mon_temp_dec, colour=decade)) +
+  geom_line(size=1) + geom_point(size=1.5)  + 
+  scale_color_manual(values=c("#124E78", "#F05D23"), name="Decade") +
+  xlab("Month") +
+  ylab("Average Temperature (C)") +
+  ggtitle("Temperature in Sydney, Australia Over Time") +
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold")) +
+  theme(legend.text = element_text(colour = "black")) +
+  scale_x_discrete(limits=lab) 
+```
+
+
+```{r}
+clean_df_city %>% 
+  filter(city_name=="SYDNEY") %>%
+  mutate(decade = factor(decade), 
+                    decade = factor(decade, levels = rev(levels(decade)))) %>%
+  ggplot(., aes(avg_mon_temp_dec, decade, group=decade, fill=..x..)) + 
+  scale_colour_gradient(low = "blue", high = "red", space = "Lab",
+        na.value = "grey50", guide = "colourbar", aesthetics = "fill", 
+        name = "") +
+  geom_density_ridges_gradient(scale=8) + 
+  xlab("Temperature (C)") +
+  ylab("Decade") +
+  ggtitle("Temperature in Sydney, Australia Over Time") +
+  #theme_tufte()
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold")) +
+  theme(legend.text = element_text(colour = "black"))
+
+```
+
+
+```{r}
+clean_df_city %>%
+  filter(city_name=="SYDNEY") %>%
+  ggplot(., aes(avg_mon_temp_dec, month_simple, group=month_simple, fill=..x..)) + 
+  scale_colour_gradient(low = "blue", high = "red", space = "Lab",
+        na.value = "grey50", guide = "colourbar", aesthetics = "fill", 
+        name = "Temp. (C)") +
+  geom_density_ridges_gradient(scale=5, alpha = 0.5) + 
+  xlab("Average Temp. (C) Each Decade") +
+  ylab("Month") +
+  ggtitle("Average Monthly Temperature in Sydney, Australia Over Time") +
+  #theme_tufte()
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold")) +
+  theme(legend.text = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold", "size"=13)) +
+  theme(legend.text = element_text(colour = "black")) +
+  theme(legend.title = element_text(size = 10)) +
+  scale_y_discrete(limits=lab) 
+  
+```
+
+
+
+
+
+```{r}
+clean_df_city %>% 
+  filter(city_name=="SYDNEY") %>%
+  mutate(decade = factor(decade), 
+                  decade = factor(decade, levels = rev(levels(decade)))) %>%
+  ggplot(., aes(month_simple, avg_mon_temp_dec, fill=decade, group=decade)) + 
+  geom_area() +
+  xlab("Month") +
+  ylab("Average Temperature Frequncy") +
+  ggtitle("Average Temperature Sydney, Australia Over Time") +
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold", "size"=13)) +
+  theme(legend.text = element_text(colour = "black")) +
+  theme(legend.title = element_text(size = 10)) +
+  guides(fill=guide_legend(title="Decade")) +
+  scale_x_discrete(limits=lab)
+```
+
+
+************************************************************************************************
+
+```{r}
+clean_df_city <- 
+    clean_df_city %>%
+    group_by(city_name) %>%
+    mutate(next.growth = dplyr::lag(avg_mon_temp_dec, n = 12, default = NA))
+
+#temp_diff -- difference in average temperature from one decade to the next
+clean_df_city <- clean_df_city %>%
+  mutate(temp_diff = avg_mon_temp_dec - next.growth)
+
+```
+
+```{r}
+clean_df_city %>%
+    filter(city_name=="SYDNEY") %>%
+   mutate(decade = factor(decade), 
+                  decade = factor(decade, levels = rev(levels(decade)))) %>%
+  filter(!decade==1910) %>%
+  mutate(temp_diff = avg_mon_temp_dec - next.growth) %>%
+  ggplot(., aes(x=temp_diff, y=decade, group=decade, fill=..x..)) +
+  scale_colour_gradient2(low = "blue", mid = "white",
+        high = "red", midpoint = 0, space = "Lab",
+        na.value = "grey50", 
+        aesthetics = "fill",
+        name = "") +
+  geom_line()+
+  geom_hline(yintercept = 0) +
+  geom_density_ridges_gradient(scale=4) + 
+  xlab("Temperature Difference (C)") +
+  ylab("Decade") +
+  ggtitle("Change in Average Monthly Temperature Decade-to-Decade in Sydney, Australia") +
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold", "size"=11)) +
+  theme(legend.text = element_text(colour = "black")) 
+
+```
+
+
+
+
+
+Other fun plots
+
+```{r}
+clean_df_city %>%
+  filter(city_name=="SYDNEY") %>%
+  ggplot(., aes(avg_mon_temp_dec, fill=decade, group=decade)) + 
+  geom_bar(stat ="bin") + 
+  xlab("Average Temperature (C) for each Month every Decade") +
+  ylab("Frequnecy") +
+  ggtitle("Average Temperature Frequency in Sydney, Australia") +
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold", "size"=13)) +
+  theme(legend.text = element_text(colour = "black")) +
+  guides(fill=guide_legend(title="Decade"))
+```
+
+```{r}
+clean_df_city %>%
+  filter(city_name=="SYDNEY") %>%
+  ggplot(., aes(avg_mon_temp_dec, fill=decade, group=decade)) + 
+  geom_area(stat ="bin") + 
+  xlab("Average Temperature (C) for each Month every Decade") +
+  ylab("Frequnecy") +
+  ggtitle("Average Temperature Frequency in Sydney, Australia") +
+  theme_solarized() +
+  theme(axis.text = element_text(colour = "black")) +
+  theme(title = element_text(colour = "black")) +
+  theme(plot.title = element_text(face="bold", "size"=13)) +
+  theme(legend.text = element_text(colour = "black")) +
+  guides(fill=guide_legend(title="Decade"))
+```
+
+
+
+

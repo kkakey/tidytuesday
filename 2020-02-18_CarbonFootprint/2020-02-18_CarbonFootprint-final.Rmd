@@ -1,0 +1,152 @@
+---
+title: "2020-02-18_CarbonFootprint"
+author: "Kristen Akey, kka2120"
+date: "2/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(rvest)
+# remotes::install_github("wilkelab/ggtext")
+library(ggtext)
+# devtools::install_github("hadley/emo")
+library(emo)
+library(tvthemes)
+library(ghibli)
+
+#load data
+food_consumption <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-18/food_consumption.csv')
+```
+
+
+
+```{r}
+#https://www.hvitfeldt.me/blog/real-emojis-in-ggplot2/#getting-the-tweets
+emoji_to_link <- function(x) {
+  paste0("https://emojipedia.org/emoji/",x) %>%
+    read_html() %>%
+    html_nodes("tr td a") %>%
+    .[1] %>%
+    html_attr("href") %>%
+    paste0("https://emojipedia.org/", .) %>%
+    read_html() %>%
+    html_node('div[class="vendor-image"] img') %>%
+    html_attr("src")
+}
+
+link_to_img <- function(x, size = 25) {
+  paste0("<img src='", x, "' width='", size, "'/>")
+}
+
+```
+
+
+
+```{r}
+cow_emoj <- ji("cow2")
+milk_emoj <- ji("milk_glass")
+goat_emoj <- ji("goat")
+pig_emoj <- ji("pig")
+rice_emoj <- ji("rice")
+fish_emoj <- ji("fish")
+chicken_emoj <- ji("chicken")
+bread_emoj <- ji("bread")
+egg_emoj <- ji("egg")
+peanuts_emoj <- ji("peanuts")
+seedling_emoj <- ji("seedling")
+
+emoji <- c(cow_emoj, milk_emoj, goat_emoj, pig_emoj, rice_emoj, fish_emoj, chicken_emoj, bread_emoj, egg_emoj, peanuts_emoj, seedling_emoj)
+
+
+food_category <- c("Beef", "Milk - inc. cheese", "Lamb & Goat", "Pork", "Rice", "Fish", "Poultry",
+              "Wheat and Wheat Products", "Eggs", "Nuts inc. Peanut Butter", "Soybeans")
+
+emoj_df <- data.frame(emoji, food_category)
+
+emoj_df <- emoj_df %>%
+  mutate(url = map_chr(emoji, slowly(~emoji_to_link(.x), rate_delay(1))),
+         label = link_to_img(url))
+
+emoj_df$food_category <- as.character(emoj_df$food_category)
+
+food_consumption <- merge(food_consumption, emoj_df, by = "food_category", all=T)
+```
+
+
+```{r}
+tot_emiss_sum <- food_consumption %>%
+  group_by(food_category) %>%
+  summarise(tot_emission = sum(co2_emmission))%>%
+  arrange(desc(tot_emission)) %>%
+  head(20)
+
+df <- inner_join(tot_emiss_sum, food_consumption, by = c("food_category"))
+
+df <- df %>%
+  select(food_category, tot_emission, label, url) %>%
+  distinct(tot_emission, .keep_all = T)
+```
+
+```{r}
+df$food_category[df$food_category == "Lamb & Goat"] <- "Lamb - Goat"
+```
+
+```{r}
+df  %>%
+  ggplot(aes(fct_reorder(food_category, tot_emission), tot_emission, label = label)) +
+  geom_bar(stat="identity", width = 0.1, colour="#7a745d") +
+  geom_richtext(aes(y = tot_emission), fill = NA, label.color = NA, # remove background and outline
+                label.padding = grid::unit(rep(0, 4), "pt") # remove padding
+  ) +
+  theme_minimal() +
+  ylab("Total Emissions - Kg CO2 per Person each Year") + xlab("Food Category") +
+  coord_flip() +
+  theme(text=element_text(family="Greta Grotesk")) +
+    ggtitle("Foods Causing the Greatest Co2 Emissions Each Year") +
+  labs(caption = "Data: nu3") +
+  theme(plot.background = element_rect(fill = '#b2a59b'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(colour = "black", size=12),
+        plot.title = element_text(size=16),
+        axis.title.x = element_text(
+                  margin = margin(t = 9, r = 0, b = 0, l = 0)),
+        plot.margin = margin(t=.4, r=.4, b=.15, l=.3, "cm"))
+  
+ggsave(plot = last_plot(), filename = "co2.png", dpi = 300, width = 8, height = 5)
+```
+
+
+
+```{r}
+###Logged
+df  %>%
+  ggplot(aes(fct_reorder(food_category, tot_emission), log(tot_emission), label = label)) +
+  geom_bar(stat="identity", width = 0.1, colour="#7a745d") +
+  geom_richtext(aes(y = log(tot_emission)), fill = NA, label.color = NA, 
+                                              # remove background and outline
+                label.padding = grid::unit(rep(0, 4), "pt") # remove padding
+  ) +
+  ylab("Total Emissions - Logged") + xlab("Food Category") +
+  theme_minimal() +
+  coord_flip() +
+  theme(text=element_text(family="Greta Grotesk")) +
+  ggtitle("Foods Causing the Greatest Co2 Emissions Each Year") +
+  labs(caption = "Data: nu3") +
+  theme(plot.background = element_rect(fill = '#b2a59b'),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(colour = "black", size=12),
+        plot.title = element_text(size=16),
+        plot.margin = margin(t=.4, r=.4, b=.15, l=.3, "cm"))
+
+ggsave(plot = last_plot(), filename = "co2-log.png", dpi = 300, width = 8, height = 5)
+```
+
+
+

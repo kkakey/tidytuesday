@@ -1,0 +1,116 @@
+---
+title: "2020-05-05-Animal_Crossing"
+author: "Kristen Akey"
+date: "5/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(magick)
+library(ggpattern)
+library(extrafont)
+library(here)
+library(scales)
+library(grid)
+library(tvthemes)
+library(shadowtext)
+
+items <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-05/items.csv')
+```
+
+
+```{r}
+items <- items %>%
+  arrange(desc(buy_value)) %>%
+  head(6) %>%
+  mutate(
+    image = map(image_url, image_read)
+  )
+```
+
+
+```{r}
+### Edit images for tiling effect
+# c <- image_read(items$image_url[1])
+c <- image_read(here("images/gc-2.png")) #I manually cropped top and bottom of original image
+i <- c(rep(c, 5))
+c_appnd <- image_append(i, stack = TRUE) 
+image_write(c_appnd, path = "images/c_appnd2.png", format = "png")
+
+
+
+d <- image_read(here("images/c-2.png")) #I manually cropped top and bottom of original image
+i2 <- c(rep(d, 4))
+d_appnd <- image_append(i2, stack = TRUE) 
+image_write(d_appnd, path = "images/d_appnd.png", format = "png")
+
+tl <- image_read(here("images/tl.png"))
+image_write(image_scale(tl, "100"), path = "images/tl2.png", format = "png")
+
+
+item_images <- c(
+  here("images/c_appnd2.png"),
+  here("images/d_appnd.png"),
+  here("images/a.png"),
+  here("images/to.png"),
+  here("images/p.png"),
+  here("images/tl2.png")
+)
+
+items <- tibble(items, filename=item_images)
+
+img <- png::readPNG("images/grass.png")
+```
+
+```{r}
+p <- ggplot(items, aes(fct_reorder(name, buy_value, .desc = T), y=buy_value)) +
+  scale_fill_continuous(guide = FALSE) +
+  annotation_custom(rasterGrob(img,
+                               width = unit(1,"npc"),
+                               height = unit(1,"npc")),
+                              -Inf, Inf, -Inf, Inf) +
+  geom_bar_pattern(stat = "identity",
+    aes(
+      pattern_filename = fct_reorder(name, buy_value)
+    ),
+    pattern         = 'image',
+    pattern_type    = 'none',
+    fill            = 'grey80',
+    colour          = 'black',
+    pattern_scale   = -2,
+    pattern_spacing = 0.05
+  ) +
+  theme(legend.position = 'none') +
+  scale_pattern_filename_discrete(choices = items %>%
+                                    arrange(buy_value) %>%
+                                    pull(filename)) +
+  theme_avatar() +
+  ggtitle("Most Expensive Items\n in Animal Crossing\n New Horizons") +
+  xlab("Items") + ylab("Cost in Bells") +
+  scale_y_continuous(labels = comma) +
+  theme(text=element_text(family="FinkHeavy")) + theme(legend.position = "none") + 
+  theme(plot.background = element_rect(fill = '#b4874b')) +
+  theme(text = element_text(colour = "#f8cf66"),
+        axis.text = element_text(colour = "#f8cf66"),
+        axis.title.x = element_shadowtext(colour = "#f8cf66", size=14),
+        axis.title.y = element_shadowtext(colour = "#f8cf66", size=14,
+                  margin = margin(t = 0, r = 50, b = 0, l = 0)),
+        axis.text.x = element_shadowtext(margin = margin(t = 0, r = 0, b = 4, l = 0),
+                                         size= 11),
+        axis.text.y = element_shadowtext(size = 10),
+        plot.title = element_shadowtext(
+                  margin = margin(t = 50, b = -40, l = 80), size= 24, hjust=.85),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        plot.margin = margin(0, .4, 0.3, .3, "cm")) 
+p
+# ggsave(plot = p, filename = "ac_tidytues2.png", dpi = 300, width = 8, height = 5)
+```
+
+
+

@@ -1,0 +1,366 @@
+---
+title: "Lab 2"
+author: "Kristen Akey, kka2120"
+date: "4/03/2020"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE, warning=F, message=F}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Text Analysis: 'The Office' Transcripts
+
+Class: QMSS-GR5018: Advanced Analytic Techniques
+
+Professor: Gregory Eirich
+
+*********************************************************************************************************
+
+Load data
+```{r, warning=F, message=F}
+library(schrute)
+library(tidyverse)
+library(tidyr)
+library(tidytext)
+library(textdata)
+library(stringr)
+library(scales)
+library(RColorBrewer)
+library(extrafont)
+library(rprojroot)
+
+#needed for knitting
+# mypath <- find_root_file(criterion = has_file("office_lab_workspace.RData"))
+# load(file = file.path(mypath, "office_lab_workspace.RData"))
+
+mydata <- schrute::theoffice
+
+mydata$season <- as.double(mydata$season) #9 seasons total
+mydata$episode <- as.double(mydata$episode) #max 28 episodes / season
+
+#subset dataframe
+mydata <- mydata %>% 
+  select(season, episode, character, text)
+```
+
+Stop Words
+```{r, warning=F, message=F}
+stop_words <- data.frame(get_stopwords()$word)
+colnames(stop_words) <- "word"
+
+  #manually add words to stop_words list
+add_stop <- data.frame(c("like", "just", "uh", "oh", "can", "got", "um", "gonna", "actually", "okay",
+                         "yeah", "hey", "really", "pum", "pa", "rum", "ole", "la", "blub", "da", "whoa",
+                         "blah", "j", "ah", "doo", "dot", "na", "dah", "bum", "right", "now", "ha", "wait", "s", "x", "beep", "yes", "know", "going", "getting","get", "want", "on"))
+colnames(add_stop) <- "word"
+  #and expanded stop_words list from Prof. Mattew L. Jockers
+source("/Users/kristenakey/Desktop/R/functions/expanded_stop_words.R")
+stop_words <- rbind(stop_words, add_stop, more_stop_words)
+```
+*********************************************************************************************************
+
+## Word Frequencies
+
+### Comparing 'The Office' transcripts by characters
+
+'Bag of Words' - characters
+```{r, warning=F, messsage=F}
+#subset dataframe
+office_seasons <- mydata %>%
+  group_by(season, episode, character) %>%
+  mutate(linenumber = row_number()) %>%
+  ungroup() 
+
+#tokenize and remove stop words
+tidy_office_seasons <- office_seasons %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by="word")
+
+#stemming
+library(SnowballC)
+tidy_office_seasons <- tidy_office_seasons %>%
+  mutate(word = wordStem(word))
+
+#characters with most lines
+# top_char <- tidy_office_seasons %>%
+#   count(linenumber, character) %>%
+#   group_by(character) %>%
+#   mutate(tot_lines = sum(n)) %>%
+#   distinct(character, .keep_all = T) %>%
+#   arrange(desc(tot_lines)) %>%
+#   select(-c(linenumber, n)) %>%
+#   filter(tot_lines > 2000)
+# 
+# tidy_office_char <- tidy_office_seasons %>%
+#   filter(character %in% top_char$character) %>%
+#   filter(word != "") 
+
+
+#make df of each individual character
+# tidy_office_seasons_list <- split(tidy_office_char, tidy_office_char$character)
+# list2env(setNames(tidy_office_seasons_list,sort(unique(tidy_office_char$character))), envir = parent.frame())
+```
+
+
+
+
+************************************************************************************************
+
+**Examine how sentiment changes throughout a season.**
+```{r, warning=F, message=F}
+#subset dataframe
+office_seasons <- mydata %>%
+  group_by(season, episode) %>%
+  mutate(linenumber = row_number()) %>%
+  ungroup() 
+
+#tokenize and remove stop words
+tidy_office_seasons <- office_seasons %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by="word") %>%
+  mutate(word = wordStem(word)) 
+
+
+####Examine how sentiment changes throughout a season
+office_sentiment <- tidy_office_seasons %>%
+  inner_join(get_sentiments("bing"), by="word") %>%
+  count(word, season, episode, index = linenumber %/% 15, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative,
+         sent_col = ifelse(sentiment<0, FALSE, TRUE))
+
+
+ggplot(office_sentiment, aes(index, sentiment,  fill=sent_col)) + 
+  scale_fill_manual(values=c("#671E1B", "#DEBB00")) +
+  geom_hline(yintercept=0, color="lightgray")+
+  geom_col(show.legend = F) +
+  facet_wrap(~season, ncol = 5, scales = "free_x") +
+  ggtitle("Sentiment through the seasons of The Office") +
+  theme_classic() +
+  theme(text=element_text(family="ATypewriterForMe")) +
+  theme(plot.title = element_text(size=17)) +
+  ylab("Sentiment") + xlab("Index") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# ggsave(plot = last_plot(), filename = "sent-season_office.png", dpi = 300, width = 8, height = 5)
+```
+
+
+Seasons 1 was the most 'neutral' season of 'The Office,' with all other seasons showing much more emotion. Towards the end of each season, the words used become more neutral than the words at the beginning of seasons. 
+
+
+**Another plot showing sentiment throughout the seasons of The Office.**
+```{r}
+####Examine how sentiment changes throughout the series
+office_sentiment2 <- tidy_office_seasons %>%
+  inner_join(get_sentiments("bing"), by="word") %>%
+  arrange(season) %>%
+  count(word, index = linenumber %/% 5, sentiment, season) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(season = factor(season), 
+         season = factor(season, levels = rev(levels(season))))
+
+ggplot(office_sentiment2, aes(index, sentiment, fill=season)) +
+  geom_hline(yintercept=0, color="lightgray")+
+  geom_col(show.legend = T) +
+  ggtitle("Sentiment through the seasons of The Office") +
+  theme_classic() +
+  theme(text=element_text(family="ATypewriterForMe")) +
+  theme(plot.title = element_text(size=17)) +
+  ylab("Sentiment") + xlab("Index") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_fill_discrete(name="Season") + 
+  guides(fill=guide_legend(ncol=5, reverse=T)) +
+  theme(legend.position = c(.77,.12))
+```
+
+*******************************************************************************************
+
+**Sentence-level sentiment analysis**
+```{r}
+office_sentences <- mydata %>%
+  unnest_tokens(sentence, text, token = "sentences")
+
+season_sent <- office_sentences %>%
+  group_by(season) %>%
+  mutate(sentence_num = 1:n(),
+         index = round(sentence_num / n(), 2)) %>%
+  unnest_tokens(word, sentence) %>%
+  inner_join(get_sentiments("afinn"), by="word") %>%
+  group_by(season, index) %>%
+  summarise(sentiment = sum(value, na.rm = TRUE)) %>%
+  arrange(desc(sentiment))
+
+ggplot(season_sent, aes(index, factor(season, levels = sort(unique(season), decreasing = TRUE)), fill = sentiment)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2() +
+  scale_x_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  labs(x = "Season Progression", y = "Season") +
+  ggtitle("Sentiment of 'The Office'",
+  subtitle = "Summary of the net sentiment score as the show progresses through each season") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "top") +
+    theme_classic() +
+  theme(text=element_text(family="ATypewriterForMe"))
+
+# ggsave(plot = last_plot(), filename = "sent_office.png", dpi = 300, width = 8, height = 5)
+```
+
+
+At the sentence-level, one can see 'The Office' is overall a very positive show.
+
+**********
+
+## Negation Analaysis
+```{r}
+#Examine the most frequent words that were preceded by “not” and were associated with a sentiment.
+AFINN <- get_sentiments("afinn")
+
+office_bigrams <- mydata %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2)
+
+#Filtering stop_words
+bigrams_separated <- office_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+not_words <- bigrams_separated %>%
+  filter(word1 == "not") %>%
+  inner_join(AFINN, by = c(word2 = "word")) %>%
+  count(word2, value, sort = TRUE)
+
+#Compute which words contributed the most in the “wrong” direction
+not_words %>%
+  mutate(contribution = n * value) %>%
+  arrange(desc(abs(contribution))) %>%
+  head(20) %>%
+  mutate(word2 = reorder(word2, contribution)) %>%
+  ggplot(aes(word2, n * value, fill = n * value > 0)) +
+  scale_fill_manual(values=c("#671E1B", "#DEBB00")) +
+  geom_col(show.legend = FALSE) +
+  xlab("Words preceded by \"not\"") +
+  ylab("Sentiment value * number of occurrences") +
+  coord_flip() +
+  theme_classic() +
+  theme(text=element_text(family="ATypewriterForMe")) +
+  ggtitle("Words that contributed most to the 'wrong' direction of sentiment analysis") +
+  theme(plot.title = element_text(size=12, hjust = 1.2, vjust=2.12)) 
+```
+
+
+Many words such as "like," "good," and "funny"-- which are positive on their own-- are actually preceded by "not," making them negative. Yellow in this plot are words classified as positive on their own, that with "not," should be negative. The reverse is true for the red.
+
+
+
+```{r}
+#Looking at most common words that appear with these negation terms
+negation_words <- c("not", "no", "never", "without", "nothing", "none", "neither")
+
+negated_words <- bigrams_separated %>%
+  filter(word1 %in% negation_words) %>%
+  inner_join(AFINN, by = c(word2 = "word")) %>%
+  count(word1, word2, value, sort = TRUE)
+
+
+#most common positive or negative words to follow negations such as ‘no’ and ‘not’
+negated_words %>%
+  mutate(contribution = n * value) %>%
+  arrange(desc(abs(contribution))) %>%
+  head(20) %>%
+  mutate(word2 = reorder(word2, contribution)) %>%
+  ggplot(aes(word2, n * value, fill = n * value > 0)) +
+  scale_fill_manual(values=c("#671E1B", "#DEBB00")) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~word1, ncol = 2, scales = "free") +
+  xlab("Words preceded by \"not\"") +
+  ylab("Sentiment value * number of occurrences") +
+  coord_flip() +
+  theme_classic() +
+  theme(text=element_text(family="ATypewriterForMe"))
+```
+
+
+**********
+
+## Clustering
+
+Analyzing networks of characters in 'The Office'
+```{r, warning=F, message=F}
+#Remaing code based off of this tutorial: http://varianceexplained.org/r/love-actually-network/ 
+library(igraph)
+
+#add line count
+mydata_lines <- mydata %>%
+  filter(season ==  2) %>% 
+  group_by(episode, line = cumsum(!is.na(character))) %>%
+  summarize(character = character[1], dialogue = str_c(text, collapse = " "))
+
+#calculates number of lines of each character in every episode
+by_speaker_season <- mydata_lines %>%
+  count(character)
+
+#select most common appearing characters for seasons with many
+by_speaker_season %>%
+  group_by(character) %>%
+  mutate(tot = sum(n)) %>%
+  distinct(character, .keep_all=T) %>%
+  arrange(desc(tot)) %>%
+  ungroup(character) %>%
+  top_n(30) %>%
+  select(character) -> top_char
+
+by_speaker_season %>% inner_join(top_char) -> by_speaker_season
+
+suppressMessages(library(reshape2))
+speaker_season_matrix <- by_speaker_season %>%
+  acast(character ~ episode, fun.aggregate = length)
+
+#Hierarchical clustering
+norm <- speaker_season_matrix / rowSums(speaker_season_matrix)
+h <- hclust(dist(norm, method = "manhattan"))
+# tiff('clustering_office.tiff', units="in", width=7, height=5, res=300)
+plot(h)
+# dev.off()
+```
+
+```{r, warning=F, message=F}
+#Visualize a timeline of all episodes
+ordering <- h$labels[h$order]
+
+epsidoes <- by_speaker_season %>%
+  filter(n() > 1) %>%        # episode with > 1 character
+  ungroup() %>%
+  mutate(episode = as.numeric(factor(episode)),
+         character = factor(character, levels = ordering))
+
+ggplot(epsidoes, aes(episode, character)) +
+  geom_point() +
+  geom_path(aes(group = episode))
+
+```
+
+```{r, warning=F, message=F}
+#Heatmap
+s <- speaker_season_matrix[, colSums(speaker_season_matrix)]
+cooccur <- speaker_season_matrix %*% t(speaker_season_matrix)
+
+#color for heatmap
+heat <- colorRampPalette(hcl.colors(11, "heat2"))(100)
+# tiff('heatmap_office.tiff', units="in",res=300)
+heatmap(cooccur, col=heat)
+# dev.off()
+```
+
+```{r, warning=F, message=F}
+g <- graph.adjacency(cooccur, weighted = TRUE, mode = "undirected", diag = FALSE)
+plot(g, edge.width = E(g)$weight)
+```
+
+
+Members of Dunder Mifflin--Stanley, Kelly, Kevin, Angela, Ryan, Pam, Michael, Dwight, and Jim--are all clustered together. 
