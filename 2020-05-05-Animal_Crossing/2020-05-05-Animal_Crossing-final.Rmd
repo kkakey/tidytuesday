@@ -1,6 +1,6 @@
 ---
 title: "2020-05-05-Animal_Crossing"
-author: "Kristen Akey"
+author: "Kristen A"
 date: "5/20/2020"
 output: html_document
 ---

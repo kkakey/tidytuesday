@@ -1,6 +1,6 @@
 ---
 title: "Lab 2"
-author: "Kristen Akey, kka2120"
+author: "Kristen A"
 date: "4/03/2020"
 output: 
   html_document:
