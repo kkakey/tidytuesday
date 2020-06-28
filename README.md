@@ -10,6 +10,16 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
+#### 2020-04-28 - [Broadway Musicals](https://github.com/kkakey/tidytuesday/tree/master/2020-04-28_Broadway) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-04-28/readme.md)
+
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-04-28_Broadway/plots/broadway_tidytues2.png)
+
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-04-28_Broadway/plots/broadway_tidytues.png)
+
+
+**************************************************************************************************
+
 #### 2020-03-17 - [The Office](https://github.com/kkakey/tidytuesday/tree/master/2020-03-17-TheOffice) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-17/readme.md)
 
