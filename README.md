@@ -3,7 +3,17 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
-#### 2020-03-17 - [Animal Crossing](https://github.com/kkakey/tidytuesday/tree/master/2020-05-05-Animal_Crossing) 
+#### 2020-06-09 - [African American Achievements](https://github.com/kkakey/tidytuesday/tree/master/2020-06-09-African_American_Achievements) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-06-09/readme.md)
+
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-06-09-African_American_Achievements/plots/21st-century.png)
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-06-09-African_American_Achievements/plots/20th-century.png)
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-06-09-African_American_Achievements/plots/19th-century.png)
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-06-09-African_American_Achievements/plots/18th-century.png)
+
+**************************************************************************************************
+
+#### 2020-05-05 - [Animal Crossing](https://github.com/kkakey/tidytuesday/tree/master/2020-05-05-Animal_Crossing) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-05-05/readme.md)
 
 ![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-05-05-Animal_Crossing/ac_plot.png)
