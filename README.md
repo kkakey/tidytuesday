@@ -3,6 +3,13 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
+#### 2020-06-09 - [Australian Animal Outcomes](https://github.com/kkakey/tidytuesday/tree/master/2020-07-07-Animal_Outcomes_Aus) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-07-21/readme.md)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2020-07-07-Animal_Outcomes_Aus/plots/animal-outcome2.png)
+
+**************************************************************************************************
+
 #### 2020-06-09 - [African American Achievements](https://github.com/kkakey/tidytuesday/tree/master/2020-06-09-African_American_Achievements) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-06-09/readme.md)
 
