@@ -1,0 +1,73 @@
+---
+title: "2020-07-07_Animal-Outcomes"
+author: "Kristen A"
+date: "8/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+library(cowplot)
+
+animal_outcomes <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-07-21/animal_outcomes.csv')
+```
+
+
+```{r}
+p <- animal_outcomes %>%
+  filter(animal_type=="Cats") %>%
+  group_by(year) %>%
+  mutate(tot_cats = sum(Total),
+         percent_tot = round(Total / tot_cats, 2)) %>%
+  ungroup() %>%
+  select(year, animal_type, outcome, Total, tot_cats, percent_tot) %>%
+  filter(outcome=="Rehomed" | outcome=="Euthanized"| outcome=="Reclaimed") %>%
+  ggplot(aes(x = year, y = percent_tot, group=outcome, color=outcome), data=.) + 
+  geom_point() + geom_line() +
+  ggtitle("Cat Outcomes in Australia") + xlab("Year") + ylab("Total Percentage") +
+  theme_cowplot(11) +
+  theme(text=element_text(family="SimpleCat"),
+        legend.position = "bottom",
+        # legend.position = c(.1,-0.1),
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-13,-13,-13,-13),
+        legend.title = element_blank(),
+        plot.background = element_rect(fill = "#FFFACD"),
+        plot.title = element_text(hjust = 0.5, vjust = -.8, size = 16)
+        ) +
+  guides(fill=guide_legend(ncol=2)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,.75)) + 
+  scale_color_manual(values=c("#9d2511", "#fabb28", "#605991")) + 
+  labs(caption = "Data: RSPCA")
+
+ggsave(plot = p, filename = "animal-outcome.png", dpi = 300, width = 8, height = 5)
+```
+
+
+
+plot with cats
+```{r}
+cat1 <- here("images/kittyonfloor.png")
+cat2 <- here("images/Cat2.png")
+# fish <- here("images/Fishies.png")
+# bowl <- here("images/foodbowl.png")
+# yarn <- here("images/yarn.png")
+```
+
+```{r}
+ggdraw(p) +
+  draw_image(cat1, x = 1, y = 1, hjust = 2.1, vjust = 1, width = 0.13, height = 0.2, scale = 1) +
+  draw_image(cat2, x = 1, y = 1, hjust = 6, vjust = 1, width = 0.13, height = 0.2, scale = .7) 
+
+ggsave(plot = last_plot(), filename = "animal-outcome2.png", dpi = 300, width = 8, height = 5)
+```
+
+
+
+
+
