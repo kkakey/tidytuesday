@@ -3,7 +3,16 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
-#### 2020-06-09 - [Australian Animal Outcomes](https://github.com/kkakey/tidytuesday/tree/master/2020-07-07-Animal_Outcomes_Aus) 
+#### 2020-08-04 - [European energy](https://github.com/kkakey/tidytuesday/tree/master/2020-08-04-European_Energy) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-08-04/readme.md#energy_types)
+
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-08-04-European_Energy/plots/euro-energy-labeled.png)
+
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-08-04-European_Energy/plots/euro-energy.png)
+
+**************************************************************************************************
+
+#### 2020-07-07 - [Australian Animal Outcomes](https://github.com/kkakey/tidytuesday/tree/master/2020-07-07-Animal_Outcomes_Aus) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-07-21/readme.md)
 
 ![](https://github.com/kkakey/tidytuesday/blob/master/2020-07-07-Animal_Outcomes_Aus/plots/animal-outcome2.png)
