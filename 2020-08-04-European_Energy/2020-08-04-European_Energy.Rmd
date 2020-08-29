@@ -1,0 +1,94 @@
+---
+title: "2020-08-04-European_Energy"
+author: "Kristen A"
+date: "8/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+
+energy_types <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/energy_types.csv')
+# country_totals <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-04/country_totals.csv')
+```
+
+
+Which countries produce the most renewable energy?
+```{r}
+energy_types[energy_types$country=="UK",]$country_name <- "United Kingdom"
+
+
+energy_types %>%
+  group_by(country_name) %>%
+  mutate(country_tot_18 = sum(`2018`),
+         type_percent_18 = round(`2018` / country_tot_18,2)) %>%
+  filter(type=="Wind" | type=="Solar"| type=="Hydro") %>%
+  arrange(desc(type_percent_18)) -> renewable
+```
+
+```{r}
+ggplot(renewable, aes(x = reorder(country_name, type_percent_18), y = type_percent_18,
+                       fill = factor(type, levels=c("Hydro", "Wind", "Solar"))),color="#FFFFFF") + 
+  geom_bar(width = .9, stat="identity") + 
+  coord_polar(theta = "y") + #start=-1.57 for -90 degree rotation
+  xlab("") + ylab("") +
+  ylim(c(0,1)) + 
+  # scale_fill_manual(values = c("#FDB813", "#FFD45E", "#F3C34B")) +
+  scale_fill_manual(values = c("#FDB813", "#FFD45E", "#f8b168")) +
+  theme_minimal() +
+      theme(
+          text=element_text(family="Hussar Szturm"),
+          legend.position = "bottom", legend.direction = "horizontal",
+          panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          axis.line = element_blank(), axis.text.y = element_blank(),
+          axis.text.x = element_blank(), axis.ticks = element_blank(),
+          plot.background = element_rect(fill="#758BFD", color = NA),
+          panel.background = element_rect(fill="#758BFD", color = NA),
+          plot.margin = unit(c(.25, 3, .25, 3), "cm"),
+          plot.title = element_text(hjust=0.5, vjust=-0.5),
+          legend.title=element_blank(),
+          legend.text = element_text(size = 6),
+          legend.margin=margin(-30,-30,-10,-30),
+          plot.caption = element_text(size = 6, margin=margin(t=10,0,0,0), hjust = 1.1),
+          plot.caption.position =  "panel") +
+  ggtitle("Total Percentage of Renewable\n Energy Production in Europe") +
+  labs(caption = "Data: Eurostat, 2018")
+# ggsave(plot = last_plot(), filename = "euro-energy.png", dpi = 300, width = 8, height = 5)
+
+
+# with country name labels
+ggplot(renewable, aes(x = reorder(country_name, type_percent_18), y = type_percent_18,
+                       fill = factor(type, levels=c("Hydro", "Wind", "Solar"))),color="#FFFFFF") + 
+  geom_bar(width = .9, stat="identity") + 
+  coord_polar(theta = "y") +
+  xlab("") + ylab("") +
+  ylim(c(0,1)) + 
+  scale_fill_manual(values = c("#FDB813", "#FFD45E", "#f8b168")) +
+  theme_minimal() +
+      theme(text=element_text(family="Hussar Szturm"),
+          panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          axis.text.y =  element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks = element_blank(),
+          plot.background = element_rect(fill="#758BFD", color = NA),
+          panel.background = element_rect(fill="#758BFD", color = NA),
+          plot.margin = unit(c(-1.75, 3, -1.75, 3), "cm"),
+          plot.title = element_text(vjust = -17.75, hjust=-.35),
+          legend.title=element_blank(),
+          legend.text = element_text(size = 6),
+          legend.margin=margin(-30,-30,-10,-30)
+          ) +
+  geom_text(data = renewable, hjust = 1, size = 1.5, family="Roboto",
+              aes(x = reorder(country_name, type_percent_18), y = 0, label = country_name)) +
+  ggtitle("Total Percentage of\n Renewable Energy\nProduction in Europe") 
+# ggsave(plot = last_plot(), filename = "euro-energy-labeled.png", dpi = 300, width = 8, height = 5)
+```
+
+
+
+
