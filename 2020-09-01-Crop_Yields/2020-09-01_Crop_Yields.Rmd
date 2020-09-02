@@ -1,0 +1,79 @@
+---
+title: "2020-09-01_Crop-Yields"
+author: "Kristen A"
+date: "9/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(waffle)
+library(animation)
+```
+
+```{r}
+key_crop_yields <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/key_crop_yields.csv')
+```
+
+```{r}
+# simplify column names
+mypattern<-(" \\(tonnes per hectare\\)")
+colnames(key_crop_yields)[4:14] <- colnames(key_crop_yields)[4:14] %>%
+  stringr::str_replace_all(.,pattern= mypattern, replacement = "")
+
+key_crop_yields %>%
+  filter(Entity=="United States") %>%
+  pivot_longer(colnames(key_crop_yields[4:14]), 
+               names_to = "food", values_to = "amount") %>%
+  #  proportion of total crop yield each year 
+  group_by(Year) %>%
+  mutate(tot_yield = sum(amount, na.rm = T),
+         prop = round(amount / tot_yield,2),
+         val = prop * 100) -> key_crop_yields_piv
+```
+
+```{r}
+# Animation
+year_range <- seq(min(key_crop_yields_piv$Year), max(key_crop_yields_piv$Year), by=1)
+
+saveGIF({
+  for (i in year_range) {
+
+  key_crop_yields_piv %>%
+    filter(Year==as.character(i)) %>%
+    arrange(desc(amount)) %>%
+    mutate(other = sum(amount[5:9], na.rm=T)) %>%
+    drop_na()-> crop_year
+  
+  amount <- c(crop_year$amount[1:4], crop_year$other[5])
+    # want size of blocks to remain the same throughout animation
+  remaining <- (102 - sum(amount))
+  amount <- c(amount, remaining)
+  food <- c(crop_year$food[1:4], "Other", "")
+  df <- data.frame(food,amount)
+  
+  # make sure ordering stays the same
+  df$reorder <- factor(df$food, levels=c("Potatoes", "Bananas", "Maize", "Rice", "Other", ""))
+  df <- df[order(df$reorder),]
+  
+  plot <- waffle(df, rows=5,size=1,colors=c("#B79268", "#ffcc33", "#FBEC5D",  
+                  "#F6F2C5", "#3B5450", "#FFFFFF")) + 
+    theme(legend.position="bottom",
+          text=element_text(family="Cheap Potatoes"),
+          plot.title = element_text(size = 9),
+          plot.subtitle = element_text(size = 7),
+          plot.caption = element_text(size = 5),
+          legend.text = element_text(size = 6),) +
+    labs(title = "U.S Crop Yields", subtitle=as.character(i),
+         caption = "1 square is approximately one tonnes per hectare")
+    print(plot)
+  }
+}, movie.name="test.gif", ani.width = 1200, ani.height = 1200,  nmax=350, ani.res=300)
+```
+
+
+
