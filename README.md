@@ -3,6 +3,13 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
+#### 2020-09-01 - [Global Crop Yields](https://github.com/kkakey/tidytuesday/tree/master/2020-09-01-Crop_Yields) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-09-01/readme.md)
+
+![](https://raw.githubusercontent.com/kkakey/tidytuesday/master/2020-09-01-Crop_Yields/crops_usa.gif)
+
+**************************************************************************************************
+
 #### 2020-08-04 - [European energy](https://github.com/kkakey/tidytuesday/tree/master/2020-08-04-European_Energy) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-08-04/readme.md#energy_types)
 
