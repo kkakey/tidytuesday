@@ -1,0 +1,204 @@
+---
+title: "2020-10-27_Great_American_Beer_Festival"
+author: "Kristen A, kkakey"
+date: "10/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+
+beer_awards <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-10-20/beer_awards.csv')
+states <- read_sf("output-data/cb_2018_us_state_500k/cb_2018_us_state_500k.shp", 
+                  crs = 2163)
+```
+
+
+```{r}
+# gold medal breweries
+beer_awards <- beer_awards %>%
+  filter(medal=="Gold") %>%
+  mutate(address= paste(brewery,city,state,sep=","))
+```
+
+
+```{r geocode}
+bGeoCode <- function(str, BingMapsKey){
+  require(RCurl)
+  require(RJSONIO)
+  u <- URLencode(paste0("http://dev.virtualearth.net/REST/v1/Locations?q=", str, "&maxResults=1&key=", BingMapsKey))
+  d <- getURL(u)
+  j <- fromJSON(d) 
+  if (j$resourceSets[[1]]$estimatedTotal > 0) {
+    formatted.address<-paste(j$resourceSets[[1]]$resources[[1]]$address,collapse=",")
+    entity.type<-j$resourceSets[[1]]$resources[[1]]$entityType
+    
+    confidence<-j$resourceSets[[1]]$resources[[1]]$confidence[1]
+    lat <- j$resourceSets[[1]]$resources[[1]]$point$coordinates[[1]]
+    lng <- j$resourceSets[[1]]$resources[[1]]$point$coordinates[[2]]
+  }
+  else {    
+    formatted.address<-"Unmatched"
+    entity.type<-"Unmatched"
+    confidence<- "Unmatched"
+    lat <- "Unmatched"
+    lng <- "Unmatched"
+    cbind(str,formatted.address,entity.type,confidence,lat,lng)
+  }
+  cbind(str,formatted.address,entity.type,confidence,lat,lng)
+}  
+
+# my API Key
+source("/Users/kristenakey/Desktop/R/api_key/bingmaps_key.R")
+library(foreach)
+
+geocoded.addresses<-foreach(a=beer_awards$address, .combine=rbind) %do% try(bGeoCode(a, my_key))
+```
+
+```{r clean geocoding}
+recode <- geocoded.addresses %>%
+  filter(lat=="Unmatched") %>%
+  pull(str)
+
+recode.address <- beer_awards[beer_awards$address %in% recode,] %>%
+  mutate(address2 = paste(city,state,sep=","))
+
+# data points I identified as needing to be recoded (points not in the U.S)
+recode <- read_sf("recode.shp")
+recode.address <- beer_awards[beer_awards$address %in% recode$str,] %>%
+  mutate(address2 = paste(city,state,sep=","))
+
+recode.addresses<-foreach(a=recode.address$address2, .combine=rbind) %do% try(bGeoCode(a, my_key))
+
+geocoded.addresses <- geocoded.addresses %>%
+  filter(lat!="Unmatched") %>%
+  select(!c(X1,X1_2,X1_1)) %>%
+  rbind(., as.data.frame(recode.addresses))
+
+geocoded.addresses <- geocoded.addresses %>%
+  filter(!is.na(lat))
+
+geocoded_shp2 <- st_as_sf(geocoded.addresses, coords = c("lng", "lat"), crs= 2163, na.fail=T)
+# geocoded_shp <- st_as_sf(geocoded.addresses, coords = c("lng", "lat"), crs= 2163, na.fail=T)
+# st_write(geocoded_shp2, "geocoded2.shp")
+```
+
+
+```{r}
+# final geocoded shapefile
+points_con <- read_sf("./output-data/geocoded_points_con.shp", crs=2163)
+```
+
+
+```{r}
+# map plot
+p1 <- ggplot() +
+  geom_sf(data=states[states$STUSPS!=c("AK","HI"),], fill="#8B4513", color="#DAA520", size=.3) +
+  geom_sf(data=points_con, alpha=.2, fill="#FAFAD2", color="#FAFAD2", size=1) +
+  theme_void() +
+  theme(plot.background = element_rect(fill="#48240A", color=NA),
+        panel.background = element_rect(fill="#48240A", color=NA),
+        text = element_text(family="BratonComposer-Regular"),
+        plot.title = element_text(vjust = -1.1, hjust=.05, color="white", size=17)) +
+  ggtitle("Gold Medal Breweries, 2016-2020") 
+```
+
+**********************************************************
+
+```{r emoji for second plot}
+library(emo)
+#https://www.hvitfeldt.me/blog/real-emojis-in-ggplot2/#getting-the-tweets
+emoji_to_link <- function(x) {
+  paste0("https://emojipedia.org/emoji/",x) %>%
+    read_html() %>%
+    html_nodes("tr td a") %>%
+    .[1] %>%
+    html_attr("href") %>%
+    paste0("https://emojipedia.org/", .) %>%
+    read_html() %>%
+    html_node('div[class="vendor-image"] img') %>%
+    html_attr("src")
+}
+link_to_img <- function(x, size = 25) {
+  paste0("<img src='", x, "' width='", size, "'/>")
+}
+```
+
+
+```{r}
+top_states <- beer_awards %>%
+  count(state) %>%
+  arrange(desc(n)) %>%
+  top_n(5) %>%
+  pull(state)
+
+# Top Golden Beer States
+# 1. California - Classic Irish-Style Dry Stout
+# 2. Colorodo - American-Style Amber Lager
+# 3. Oregon - American-Style Wheat Beer
+
+library(ggtext)
+library(emojifont)
+
+label <- rep(emoji(search_emoji('beer'))[1], dim(beer_awards)[1])
+beer_awards <- cbind(beer_awards,label)
+
+df <- beer_awards %>%
+  filter(state %in% top_states) %>%
+  group_by(state) %>%
+  mutate(n_count = n()) %>% 
+  distinct(state, .keep_all = T)
+
+library(rvest)
+emoj_df <- df %>%
+  mutate(url = map_chr(label, slowly(~emoji_to_link(.x), rate_delay(1))),
+         label = link_to_img(url))
+```
+
+
+```{r}
+# sometimes fonts are not 'recognized' - this solves that
+library(showtext)
+font_add("BratonComposer-Regular", "/Users/kristenakey/Library/Fonts/BratonComposer-Regular.ttf")  
+font_add("AndaleMono", "/System/Library/Fonts/Supplemental/Andale Mono.ttf")  
+showtext_auto()
+```
+
+```{r}
+# gold medal states
+p2 <- emoj_df %>%
+  ggplot(., aes(fct_reorder(state, n_count), n_count, label = label)) +
+  geom_bar(stat = "identity", width = 0.1, binwidth=0, color="grey20", fill="#DAA520") +
+  geom_richtext(aes(y = n_count), fill = NA, label.color = NA, 
+                label.padding = grid::unit(rep(0, 4), "pt")
+  ) +
+  coord_flip(ylim=c(0,1100), expand = T) +
+    theme(plot.background = element_rect(fill="#48240A", color=NA),
+        panel.background = element_rect(fill="#48240A", color=NA),
+        text = element_text(family="BratonComposer-Regular", color="white"),
+        aspect.ratio = 1/3,
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_text(colour = "white", size=12, family="AndaleMono", hjust = 9),
+        axis.text.x = element_text(colour = "white")
+       )+
+  scale_y_continuous(expand = c(0,0)) +
+  xlab("") +ylab("Number of Gold Medal Breweries") 
+```
+
+
+```{r put plots together!}
+library(patchwork)
+final <- (p1) /
+  p2
+
+ggsave(plot=final, "final2.png", dpi=900)
+```
+
+
+
