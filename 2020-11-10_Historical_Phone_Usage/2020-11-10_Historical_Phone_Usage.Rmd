@@ -1,0 +1,112 @@
+---
+title: "2020-11-10_Historical_Phone_Usage"
+author: "Kristen A, kkakey"
+date: "11/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+mobile <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-10/mobile.csv')
+landline <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-10/landline.csv')
+```
+
+```{r join data}
+df <- landline %>%
+  # avoid duplicate columns
+  select(entity, year, landline_subs) %>%
+  left_join(., mobile, by=c("entity", "year"))
+```
+
+```{r}
+df <- df %>%
+  mutate(mobil_100 = (mobile_subs/total_pop)*100,
+         landline_100 = (landline_subs/total_pop)*100)
+
+## replicate UK plot 
+## https://ourworldindata.org/technology-adoption#technology-leapfrogging
+uk_df <- df %>%
+  filter(entity=="United Kingdom",
+         year < 2014) %>%
+  mutate(mobil_100_adj = mobil_100*6e+05,
+         landline_100_adj = landline_100*6e+05,)
+```
+
+
+```{r}
+ggplot(data=uk_df) + 
+  geom_line(aes(x=year,y=landline_100_adj), color="#37416D") +  
+  geom_point(aes(x=year,y=landline_100_adj), size=.8, color="#37416D") +
+  geom_line(aes(x=year,y=mobil_100_adj), color="#970000") +
+  geom_point(aes(x=year,y=mobil_100_adj), size=.8, color="#970000") +
+  ggthemes::theme_hc() +
+  theme(text = element_text(family="PTSans-Regular"),
+        panel.grid.major = element_line(colour = "black",linetype="dotted",size=0.5),
+        axis.line.x = element_line(size = .4, colour = "grey80"),
+        plot.title = element_text(size=13.5, hjust=0),
+        plot.subtitle = element_text(size=10, hjust=0, vjust=2.1,
+                                     margin=margin(0,0,20,0)),
+        plot.margin = margin(t = 0, r = 25, b = 0, l = 0),
+        panel.margin = margin(t = 0, r = 500, b = 0, l = 0),
+        plot.caption = element_text(hjust=0, size=8)) +
+  ggtitle("Mobile and fixed landline telephone subscriptions, United Kingdom, 1990 to\n2013") +
+  labs(subtitle = "The number of fixed landline telephone and mobile cellular phone subscriptions, measured per 100 people.",
+       caption = "Source: World Bank, World Development Indicators (WDI)") +
+  xlab("") + ylab("") +
+  scale_y_continuous(expand = c(0,0), breaks = c(0,20, 40,60,80,100,120),
+                     limits = c(0, 130)) +
+  coord_fixed(ratio=1/6, clip = "off") +
+  annotate("text",label="Fixed telephone subscriptions\n(per 100 people)", x=2011, y=53.2,
+           size=2.5,  family="PTSans-Regular", hjust = 0, color="#37416D") +
+  annotate("text",label="Mobile cellular subscriptions\n(per 100 people)", x=2011, y=120,
+           size=2.5,family="PTSans-Regular", hjust = 0, color="#970000") +
+  ggsave("plot.png", dpi=400, width=8.4, height=8.5)
+
+```
+
+
+```{r}
+data <- data.frame(Date=rep(uk_df$year, 2), 
+                  act_noact=c(uk_df$landline_100_adj, uk_df$mobil_100_adj), 
+                  grp=rep(c("Fixed telephone subscriptions\n(per 100 people)",
+                            "Mobile cellular subscriptions\n(per 100 people)"), 
+                          each=nrow(uk_df)))
+
+p <-  ggplot(data) +
+  geom_line(aes(x=Date, y=act_noact, group=grp, color=grp)) + 
+  geom_point(aes(x=Date, y=act_noact, group=grp, color=grp)) +
+    ggthemes::theme_hc() +
+  theme(text = element_text(family="PTSans-Regular"),
+        panel.grid.major = element_line(colour = "black",linetype="dotted",size=0.5),
+        axis.line.x = element_line(size = .4, colour = "grey80"),
+        plot.title = element_text(size=10.5, hjust=0,
+                                  margin=margin(t=20)),
+        plot.subtitle = element_text(size=7, hjust=0, vjust=2.1,
+                                     margin=margin(4,0,0,0)),
+        plot.margin = margin(t = 0, r = 25, b = 0, l = 0),
+        panel.margin = margin(t = 0, r = 500, b = 0, l = 0),
+        plot.caption = element_text(hjust=0, size=5),
+        legend.position = "none") +
+  ggtitle("Mobile and fixed landline telephone subscriptions, United Kingdom, 1990 to\n2013") +
+  labs(subtitle = "The number of fixed landline telephone and mobile cellular phone subscriptions, measured per 100 people.",
+       caption = "Source: World Bank, World Development Indicators (WDI)") +
+  xlab("") + ylab("") +
+  coord_fixed(clip = "off") +
+  geom_text(aes(x=Date+1, y=act_noact, group=grp, label=grp, color=grp),
+           size=2.5,  family="PTSans-Regular", hjust = 0) +
+  scale_color_manual(values = c("#37416D","#970000")) +
+  view_follow(fixed_y = c(0,NA), fixed_x = c(1990,NA)) +
+  transition_reveal(Date) 
+
+
+anim <- animate(p,end_pause = 20, height = 6, width = 6, units = "in", res = 300)
+magick::image_write(anim, path="myanimation.gif")
+```
+
