@@ -3,7 +3,14 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
-#### 2020-10-20 - [Historical Phone Usage](https://github.com/kkakey/tidytuesday/blob/master/2020-11-10_Historical_Phone_Usage/2020-11-10_Historical_Phone_Usage.Rmd) 
+#### 2020-12-01 - [Toronto Shelters](https://github.com/kkakey/tidytuesday/blob/master/2020-12-01_Toronto_Shelters/20202-12-01_Toronto_Shelters.Rmd) 
+- [Data](https://github.com/sharlagelfand/opendatatoronto)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2020-12-01_Toronto_Shelters/plot.png)
+
+**************************************************************************************************
+
+#### 2020-11-10 - [Historical Phone Usage](https://github.com/kkakey/tidytuesday/blob/master/2020-11-10_Historical_Phone_Usage/2020-11-10_Historical_Phone_Usage.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-11-10/readme.md)
 - Replicated plot from [Our World in Data](https://ourworldindata.org/grapher/mobile-and-fixed-landline-telephone-subscriptions?time=1990..2013)
 
