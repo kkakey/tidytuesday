@@ -8,9 +8,6 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 ![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-12_Tate-Art/plot.png)
 
-
-<iframe width="700" height="400" scrolling="no" frameborder="no"  src="https://kka2120.shinyapps.io/tate-art"> </iframe> 
-
 interactive plot [link](https://kka2120.shinyapps.io/tate-art)
 
 **************************************************************************************************
