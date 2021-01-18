@@ -3,8 +3,20 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
-#### 2020-12-01 - [Toronto Shelters](https://github.com/kkakey/tidytuesday/blob/master/2020-12-01_Toronto_Shelters/20202-12-01_Toronto_Shelters.Rmd) 
+#### 2021-01-12 - [Tate Art Collection](https://github.com/kkakey/tidytuesday/blob/master/2021-01-12_Tate-Art/2020-01-12_Tate-Art.Rmd) 
 - [Data](https://github.com/sharlagelfand/opendatatoronto)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-12_Tate-Art/plot.png)
+
+
+<iframe width="700" height="400" scrolling="no" frameborder="no"  src="https://kka2120.shinyapps.io/tate-art"> </iframe> 
+
+interactive plot [link](https://kka2120.shinyapps.io/tate-art)
+
+**************************************************************************************************
+
+#### 2020-12-01 - [Toronto Shelters](https://github.com/kkakey/tidytuesday/blob/master/2020-12-01_Toronto_Shelters/20202-12-01_Toronto_Shelters.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-01-12/readme.md)
 
 ![](https://github.com/kkakey/tidytuesday/blob/master/2020-12-01_Toronto_Shelters/plot.png)
 
