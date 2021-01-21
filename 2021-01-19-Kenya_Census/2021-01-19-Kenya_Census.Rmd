@@ -53,13 +53,15 @@ kenya <- kenya %>%
   left_join(.,df, by="SubCounty")
 ```
 
+
 ```{r}
 ggplot() +
   geom_sf(data=kenya, aes(fill=diff), size=.3, color="grey10") +
   scale_fill_gradient2(low = "#ffc324", mid = "grey99",
         high = "#6ba304", midpoint = 0, space = "Lab",
         na.value = "#DCBBA8",limit = c(-10,10), 
-        breaks = c(-5,0,5), labels = c("-5%", "Even", "5%"),
+        breaks = c(-5,0,5), labels = c("+5%\nmango\nfarmers", "Even",
+                                       "+5%\navacodo\nfarmers"),
         name = "") +
   theme_void() +
   coord_sf(clip = "off") +
@@ -73,7 +75,7 @@ ggplot() +
                                         color="#D1C4E9"),
         plot.margin = unit(c(t=4,l=0,b=0,r=0), "cm"),
         plot.title = element_text(hjust=.5, vjust=10.9),
-        legend.text = element_text(size=6),
+        legend.text = element_text(size=4.5),
         plot.caption = element_text(size=6, hjust=1.3, vjust=10)) +
   geom_richtext(aes(x=38,y=7.5,
                     label=paste0(
@@ -96,8 +98,6 @@ ggplot() +
                     fill = NA, label.color = NA, size=3, color="#4D1F04") +
   ggtitle("Avacodo and Mango Producers in Kenya") +
   labs(caption = "Data: rKenyaCensus | @kkakey") +
-  ggsave('plot.png', dpi=500)
+  ggsave('plot2.png', dpi=500)
 ```
-
-
 

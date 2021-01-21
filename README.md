@@ -3,10 +3,10 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
-#### 2021-01-19 - [Tate Art Collection](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/2021-01-19-Kenya_Census.Rmd) 
+#### 2021-01-19 - [Kenya Census](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/2021-01-19-Kenya_Census.Rmd) 
 - [Data](https://github.com/sharlagelfand/opendatatoronto)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/plot.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/plot2.png)
 
 **************************************************************************************************
 
