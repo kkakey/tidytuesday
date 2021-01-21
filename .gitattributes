@@ -1,1 +1,3 @@
 *.r linguist-vendored=false
+*.html linguist-language=R
+*.html linguist-language=r
