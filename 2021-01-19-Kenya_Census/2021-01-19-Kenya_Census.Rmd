@@ -1,0 +1,58 @@
+---
+title: "2021-01-19-Kenya_Census"
+author: "Kristen A, kkakey"
+date: "1/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(ggtext)
+```
+
+```{r}
+crops <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-01-19/crops.csv')
+
+# https://africaopendata.org/dataset/kenya-counties-shapefile/resource/0b78f25e-494e-4258-96b8-a3ab2b35b121
+kenya <-  read_sf("./raw-data/kenyan-counties/County.shp", crs=4326)
+```
+
+```{r}
+# the top crops produced behind general crops in Kenya are avocados and mangos
+crops %>%
+  filter(SubCounty=='KENYA') %>%
+  pivot_longer(!SubCounty) %>%
+  arrange(desc(value)) %>%
+  top_n(3)
+```
+
+
+```{r}
+crops %>%
+  filter(!SubCounty=='KENYA') %>%
+  select(SubCounty, Farming, Avocado, Mango) %>%
+  mutate(tot_prod_ava = round(Avocado / 966976,3)*100,
+         tot_prod_farm = round(Farming / 6354211,3)*100,
+         tot_prod_mango = round(Mango / 796867,3)*100,)-> df
+
+# difference between avacode vs mango production
+df <- df %>%
+  mutate_all(funs(replace_na(.,0))) %>%
+  mutate(diff = tot_prod_ava - tot_prod_mango) %>%
+  filter(!c(tot_prod_ava==0 & tot_prod_mango==0))
+
+
+# join data
+kenya <- kenya %>%
+  mutate(SubCounty = toupper(COUNTY)) %>%
+  left_join(.,df, by="SubCounty")
+```
+
+
+
+
