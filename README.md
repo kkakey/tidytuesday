@@ -3,6 +3,13 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
+#### 2021-02-16 - [DuBois Challenge](https://github.com/kkakey/tidytuesday/blob/master/2021-02-16-DuBois_Challenge/2021-02-16-DuBois_Challenge.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-16/readme.md)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2021-02-16-DuBois_Challenge/plot.png)
+
+**************************************************************************************************
+
 #### 2021-01-19 - [Kenya Census](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/2021-01-19-Kenya_Census.Rmd) 
 - [Data](https://github.com/sharlagelfand/opendatatoronto)
 
