@@ -3,6 +3,13 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
+#### 2021-03-02 - [DuBois Challenge](https://github.com/kkakey/tidytuesday/blob/master/2021-03-02-Superbowl_Ads/2021-03-02_Superbowl-Ads.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-02/readme.md)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2021-03-02-Superbowl_Ads/plot.png)
+
+**************************************************************************************************
+
 #### 2021-02-16 - [DuBois Challenge](https://github.com/kkakey/tidytuesday/blob/master/2021-02-16-DuBois_Challenge/2021-02-16-DuBois_Challenge.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-16/readme.md)
 - Original visualization [here](https://raw.githubusercontent.com/ajstarks/dubois-data-portraits/master/challenge/challenge07/original-plate-25.jpg)
