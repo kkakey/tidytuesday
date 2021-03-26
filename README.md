@@ -34,6 +34,14 @@ interactive plot [here](https://kka2120.shinyapps.io/tate-art)
 
 **************************************************************************************************
 
+#### 2020-12-01 - [Women of 2020](https://github.com/kkakey/tidytuesday/blob/master/2020-12-08-Women_of_2020/2020-12-08-Women_of_2020.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-12-08/readme.md)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2020-12-08-Women_of_2020/plot.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2020-12-08-Women_of_2020/table1.html)
+
+**************************************************************************************************
+
 #### 2020-12-01 - [Toronto Shelters](https://github.com/kkakey/tidytuesday/blob/master/2020-12-01_Toronto_Shelters/20202-12-01_Toronto_Shelters.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-01-12/readme.md)
 
