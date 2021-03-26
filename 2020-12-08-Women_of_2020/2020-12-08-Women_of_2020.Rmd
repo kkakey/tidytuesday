@@ -1,0 +1,98 @@
+---
+title: "Women's History Month"
+author: "Kristen A, kkakey"
+date: "3/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, error = F)
+```
+
+I was inspired to go back to this dataset and create this as part of Women's History month.
+
+```{r}
+women <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-12-08/women.csv')
+women <- tibble::rowid_to_column(women, "ID")
+```
+
+```{r}
+library(tidyverse)
+library(ggimage)
+library(shadowtext)
+```
+
+```{r}
+women <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-12-08/women.csv')  %>%
+  arrange(category)
+women <- tibble::rowid_to_column(women, "ID")
+
+# creating points
+s7 <- women[1,]
+s1<- slice(women, n=2:28)
+s2<- slice(women, n=29:51)
+s3<- slice(women, n=52:69)
+s4<- slice(women, n=70:83)
+s5<- slice(women, n=84:93)
+s6<- slice(women, n=94:100)
+
+data7 <- cbind(s7, cont = 1, x=0)
+data1 <- cbind(s1, cont = seq(1,26,0.9285714), x=rep(15))
+data2 <- cbind(s2, cont = seq(1,25.5, 1.108696), x=rep(12.5))
+data3 <- cbind(s3, cont = seq(1,25, 1.388889), x=rep(10))
+data4 <- cbind(s4, cont = seq(1,25,by=1.785714), x=rep(7.5))
+data5 <- cbind(s5, cont = seq(1,25,by=2.5), x=rep(5))
+data6 <- cbind(s6, cont = seq(1,25,by=25/7), x=rep(2.5))
+
+data <- bind_rows(list(data1, data2, data3, data4, data5, data6))
+```
+
+
+
+```{r}
+ggplot() +
+  geom_image(data=data,aes(x=x,y=cont,image=img), size=.06) +
+  geom_shadowtext(data=data,aes(label=name, x=x+1.05,y=cont),
+            color="white", size=1.8) +
+  geom_image(data=data7, aes(x=x,y=cont,image=img), size=.06) +
+  geom_shadowtext(data=data7, aes(label=name[1], x=0,y=.3),
+            color="white", size=1.8) +
+  coord_polar(theta = "y") +
+  xlim(0,NA) +
+  ylim(c(.25,NA)) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        plot.title = element_text(hjust=.5, vjust=-6,
+                                  size=38, color="#7FC29B",
+                                  family="Gotham-Black"),
+        plot.subtitle = element_text(hjust=.5, vjust=-15, size=18,
+                                     color="#FFAD69", 
+                                     family = "Gotham-Book"),
+        plot.margin = unit(c(t=-1.5,r=-2,b=-3,l=-2), "cm"),
+        axis.line = element_blank(), axis.text.y = element_blank(),
+        axis.text.x = element_blank(), axis.ticks = element_blank(),
+        plot.background = element_rect(fill="#1E3959",color=NA),
+        panel.background = element_rect(fill="#1E3959",color=NA)) +
+  xlab("") + ylab("") +
+  ggtitle("Women of 2020") +
+  labs(subtitle = "BBC's list of 100 inspiring and\ninfluential women from around the world") +
+  ggsave("plot.png", width = 9.3, height=12)
+```
+
+
+```{r}
+# accompanying table
+data2 <- bind_rows(list(data7, data1, data2, data3, 
+                        data4, data5, data6))
+
+library(kableExtra)
+data2 %>%
+  select(name, category, description, country) %>%
+  kbl() %>%
+  kable_paper("hover", full_width = T) %>%
+  scroll_box(height = "300") #%>%
+  # save table
+  # save_kable(file = "table1.png", self_contained = T)
+```
+
