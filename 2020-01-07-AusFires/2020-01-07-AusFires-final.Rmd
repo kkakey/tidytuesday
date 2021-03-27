@@ -67,8 +67,8 @@ lab <- as.factor(c("Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug."
 clean_df_city$decade <- factor(clean_df_city$decade)
 
 clean_df_city %>%
-  filter(city_name=="SYDNEY") %>%
-  filter(decade==1960| decade==2010) %>%
+  filter(city_name=="SYDNEY",
+          decade==1960| decade==2010) %>%
   ggplot(., aes(x=month_simple, y=avg_mon_temp_dec, colour=decade)) +
   geom_line(size=1) + geom_point(size=1.5)  + 
   scale_color_manual(values=c("#124E78", "#F05D23"), name="Decade") +
@@ -76,10 +76,10 @@ clean_df_city %>%
   ylab("Average Temperature (C)") +
   ggtitle("Temperature in Sydney, Australia Over Time") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold")) +
-  theme(legend.text = element_text(colour = "black")) +
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold"),
+        legend.text = element_text(colour = "black")) +
   scale_x_discrete(limits=lab) 
 
 #ggsave(plot = last_plot(), filename = "aus-temp.png", dpi = 300, width = 8, height = 5)
@@ -100,10 +100,10 @@ clean_df_city %>%
   ylab("Decade") +
   ggtitle("Temperature in Sydney, Australia Over Time") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold")) +
-  theme(legend.text = element_text(colour = "black"))
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold"),
+        legend.text = element_text(colour = "black"))
 
 #ggsave(plot = last_plot(), filename = "aus-temp-density.png", dpi = 300, width = 8, height = 5)
 ```
@@ -121,13 +121,13 @@ clean_df_city %>%
   ylab("Month") +
   ggtitle("Average Monthly Temperature in Sydney, Australia Over Time") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold")) +
-  theme(legend.text = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold", "size"=13)) +
-  theme(legend.text = element_text(colour = "black")) +
-  theme(legend.title = element_text(size = 10)) +
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold"),
+        legend.text = element_text(colour = "black"),
+        plot.title = element_text(face="bold", "size"=13),
+        legend.text = element_text(colour = "black"),
+        legend.title = element_text(size = 10)) +
   scale_y_discrete(limits=lab) 
   
 #ggsave(plot = last_plot(), filename = "aus-temp-density-month.png", dpi = 300, width = 8, height = 5)
@@ -148,12 +148,12 @@ clean_df_city %>%
   ylab("Average Temperature Frequncy") +
   ggtitle("Average Temperature Sydney, Australia Over Time") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold", "size"=13)) +
-  theme(legend.text = element_text(colour = "black")) +
-  theme(legend.title = element_text(size = 10)) +
-  guides(fill=guide_legend(title="Decade")) +
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold", "size"=13),
+        legend.text = element_text(colour = "black"),
+        legend.title = element_text(size = 10),
+        fill=guide_legend(title="Decade")) +
   scale_x_discrete(limits=lab)
 
 #ggsave(plot = last_plot(), filename = "aus-temp-month.png", dpi = 300, width = 8, height = 5)
@@ -176,7 +176,7 @@ clean_df_city <- clean_df_city %>%
 
 ```{r}
 clean_df_city %>%
-    filter(city_name=="SYDNEY") %>%
+  filter(city_name=="SYDNEY") %>%
    mutate(decade = factor(decade), 
                   decade = factor(decade, levels = rev(levels(decade)))) %>%
   filter(!decade==1910) %>%
@@ -194,10 +194,10 @@ clean_df_city %>%
   ylab("Decade") +
   ggtitle("Change in Average Monthly Temperature Decade-to-Decade in Sydney, Australia") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold", "size"=11)) +
-  theme(legend.text = element_text(colour = "black")) 
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold", "size"=11),
+        legend.text = element_text(colour = "black")) 
 
 #ggsave(plot = last_plot(), filename = "aus-temp-density-dec_mon.png", dpi = 300, width = 8, height = 5)
 ```
@@ -217,10 +217,10 @@ clean_df_city %>%
   ylab("Frequnecy") +
   ggtitle("Average Temperature Frequency in Sydney, Australia") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold", "size"=13)) +
-  theme(legend.text = element_text(colour = "black")) +
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold", "size"=13),
+        legend.text = element_text(colour = "black")) +
   guides(fill=guide_legend(title="Decade"))
 
 #ggsave(plot = last_plot(), filename = "aus-temp-freq-blocks.png", dpi = 300, width = 8, height = 5)
@@ -235,10 +235,10 @@ clean_df_city %>%
   ylab("Frequnecy") +
   ggtitle("Average Temperature Frequency in Sydney, Australia") +
   theme_solarized() +
-  theme(axis.text = element_text(colour = "black")) +
-  theme(title = element_text(colour = "black")) +
-  theme(plot.title = element_text(face="bold", "size"=13)) +
-  theme(legend.text = element_text(colour = "black")) +
+  theme(axis.text = element_text(colour = "black"),
+        title = element_text(colour = "black"),
+        plot.title = element_text(face="bold", "size"=13),
+        legend.text = element_text(colour = "black")) +
   guides(fill=guide_legend(title="Decade"))
 
 #ggsave(plot = last_plot(), filename = "aus-temp-freq.png", dpi = 300, width = 8, height = 5)

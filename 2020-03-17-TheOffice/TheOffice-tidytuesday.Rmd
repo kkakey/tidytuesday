@@ -136,11 +136,11 @@ ggplot(office_sentiment, aes(index, sentiment,  fill=sent_col)) +
   geom_col(show.legend = F) +
   facet_wrap(~season, ncol = 5, scales = "free_x") +
   ggtitle("Sentiment through the seasons of The Office") +
-  theme_classic() +
-  theme(text=element_text(family="ATypewriterForMe")) +
-  theme(plot.title = element_text(size=17)) +
+  theme_classic() +s
   ylab("Sentiment") + xlab("Index") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  theme(plot.title = element_text(size=17),
+        text=element_text(family="ATypewriterForMe"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 # ggsave(plot = last_plot(), filename = "sent-season_office.png", dpi = 300, width = 8, height = 5)
 ```
@@ -157,8 +157,8 @@ office_sentiment2 <- tidy_office_seasons %>%
   arrange(season) %>%
   count(word, index = linenumber %/% 5, sentiment, season) %>%
   spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(season = factor(season), 
+  mutate(sentiment = positive - negative,
+         season = factor(season), 
          season = factor(season, levels = rev(levels(season))))
 
 ggplot(office_sentiment2, aes(index, sentiment, fill=season)) +
@@ -166,13 +166,13 @@ ggplot(office_sentiment2, aes(index, sentiment, fill=season)) +
   geom_col(show.legend = T) +
   ggtitle("Sentiment through the seasons of The Office") +
   theme_classic() +
-  theme(text=element_text(family="ATypewriterForMe")) +
-  theme(plot.title = element_text(size=17)) +
   ylab("Sentiment") + xlab("Index") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   scale_fill_discrete(name="Season") + 
   guides(fill=guide_legend(ncol=5, reverse=T)) +
-  theme(legend.position = c(.77,.12))
+  theme(legend.position = c(.77,.12),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        plot.title = element_text(size=17),
+        text=element_text(family="ATypewriterForMe"))
 ```
 
 *******************************************************************************************
@@ -200,11 +200,11 @@ ggplot(season_sent, aes(index, factor(season, levels = sort(unique(season), decr
   labs(x = "Season Progression", y = "Season") +
   ggtitle("Sentiment of 'The Office'",
   subtitle = "Summary of the net sentiment score as the show progresses through each season") +
-  theme(panel.grid.major = element_blank(),
+  theme_classic() +
+  theme(text=element_text(family="ATypewriterForMe"),
+        panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = "top") +
-    theme_classic() +
-  theme(text=element_text(family="ATypewriterForMe"))
+        legend.position = "top")
 
 # ggsave(plot = last_plot(), filename = "sent_office.png", dpi = 300, width = 8, height = 5)
 ```
@@ -244,9 +244,9 @@ not_words %>%
   ylab("Sentiment value * number of occurrences") +
   coord_flip() +
   theme_classic() +
-  theme(text=element_text(family="ATypewriterForMe")) +
   ggtitle("Words that contributed most to the 'wrong' direction of sentiment analysis") +
-  theme(plot.title = element_text(size=12, hjust = 1.2, vjust=2.12)) 
+  theme(plot.title = element_text(size=12, hjust = 1.2, vjust=2.12),
+        text=element_text(family="ATypewriterForMe")) 
 ```
 
 

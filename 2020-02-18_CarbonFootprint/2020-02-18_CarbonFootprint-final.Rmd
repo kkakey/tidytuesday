@@ -106,8 +106,7 @@ df  %>%
   theme_minimal() +
   ylab("Total Emissions - Kg CO2 per Person each Year") + xlab("Food Category") +
   coord_flip() +
-  theme(text=element_text(family="Greta Grotesk")) +
-    ggtitle("Foods Causing the Greatest Co2 Emissions Each Year") +
+  ggtitle("Foods Causing the Greatest Co2 Emissions Each Year") +
   labs(caption = "Data: nu3") +
   theme(plot.background = element_rect(fill = '#b2a59b'),
         panel.grid.major = element_blank(),
@@ -116,7 +115,8 @@ df  %>%
         plot.title = element_text(size=16),
         axis.title.x = element_text(
                   margin = margin(t = 9, r = 0, b = 0, l = 0)),
-        plot.margin = margin(t=.4, r=.4, b=.15, l=.3, "cm"))
+        plot.margin = margin(t=.4, r=.4, b=.15, l=.3, "cm"),
+        text=element_text(family="Greta Grotesk"))
   
 ggsave(plot = last_plot(), filename = "co2.png", dpi = 300, width = 8, height = 5)
 ```
@@ -135,7 +135,6 @@ df  %>%
   ylab("Total Emissions - Logged") + xlab("Food Category") +
   theme_minimal() +
   coord_flip() +
-  theme(text=element_text(family="Greta Grotesk")) +
   ggtitle("Foods Causing the Greatest Co2 Emissions Each Year") +
   labs(caption = "Data: nu3") +
   theme(plot.background = element_rect(fill = '#b2a59b'),
@@ -143,7 +142,8 @@ df  %>%
         panel.grid.minor = element_blank(),
         axis.text = element_text(colour = "black", size=12),
         plot.title = element_text(size=16),
-        plot.margin = margin(t=.4, r=.4, b=.15, l=.3, "cm"))
+        plot.margin = margin(t=.4, r=.4, b=.15, l=.3, "cm"),
+        text=element_text(family="Greta Grotesk"))
 
 ggsave(plot = last_plot(), filename = "co2-log.png", dpi = 300, width = 8, height = 5)
 ```
