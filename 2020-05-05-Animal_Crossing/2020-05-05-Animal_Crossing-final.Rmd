@@ -86,7 +86,6 @@ p <- ggplot(items, aes(fct_reorder(name, buy_value, .desc = T), y=buy_value)) +
     pattern_scale   = -2,
     pattern_spacing = 0.05
   ) +
-  theme(legend.position = 'none') +
   scale_pattern_filename_discrete(choices = items %>%
                                     arrange(buy_value) %>%
                                     pull(filename)) +
@@ -94,9 +93,10 @@ p <- ggplot(items, aes(fct_reorder(name, buy_value, .desc = T), y=buy_value)) +
   ggtitle("Most Expensive Items\n in Animal Crossing\n New Horizons") +
   xlab("Items") + ylab("Cost in Bells") +
   scale_y_continuous(labels = comma) +
-  theme(text=element_text(family="FinkHeavy")) + theme(legend.position = "none") + 
-  theme(plot.background = element_rect(fill = '#b4874b')) +
-  theme(text = element_text(colour = "#f8cf66"),
+  theme(text=element_text(family="FinkHeavy"),
+        legend.position = "none",
+        plot.background = element_rect(fill = '#b4874b'),
+        text = element_text(colour = "#f8cf66"),
         axis.text = element_text(colour = "#f8cf66"),
         axis.title.x = element_shadowtext(colour = "#f8cf66", size=14),
         axis.title.y = element_shadowtext(colour = "#f8cf66", size=14,
