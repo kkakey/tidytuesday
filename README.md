@@ -3,6 +3,14 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 **************************************************************************************************
 
+#### 2021-03-02 - [Video Games](https://github.com/kkakey/tidytuesday/blob/master/2021-03-15-Video_Games/2021-03-15_Video-Games.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-16/readme.md)
+
+![](https://github.com/kkakey/tidytuesday/blob/master/2021-03-15-Video_Games/plot.png)
+
+
+**************************************************************************************************
+
 #### 2021-03-02 - [Superbowl Ads](https://github.com/kkakey/tidytuesday/blob/master/2021-03-02-Superbowl_Ads/2021-03-02_Superbowl-Ads.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-02/readme.md)
 
