@@ -40,6 +40,8 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 
 interactive plot [here](https://kka2120.shinyapps.io/tate-art)
 
+![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-12_Tate-Art/shiny_img.png)
+
 **************************************************************************************************
 
 #### 2020-12-01 - [Women of 2020](https://github.com/kkakey/tidytuesday/blob/master/2020-12-08-Women_of_2020/2020-12-08-Women_of_2020.Rmd) 
