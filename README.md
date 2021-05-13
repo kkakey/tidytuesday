@@ -41,7 +41,7 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 interactive plot [here](https://kka2120.shinyapps.io/tate-art)
 
 <p align="center">
-<a href="url"><img src="https://raw.githubusercontent.com/kkakey/tidytuesday/main/2021-01-12_Tate-Art/plot.png" width="500" ></a>
+<a href="url"><img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-01-12_Tate-Art/shiny_img.png" width="500" ></a>
 </p>
 
 
