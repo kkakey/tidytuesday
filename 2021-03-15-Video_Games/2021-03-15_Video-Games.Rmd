@@ -1,0 +1,145 @@
+---
+title: "2021-03-15_Video-Games"
+author: "Kristen A, kkakey"
+date: "5/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(zoo)
+library(ggimage)
+library(ggfx)
+library(ggtext)
+```
+
+```{r}
+## get data on new updates/releases of the game from https://en.wikipedia.org/wiki/Dead_by_Daylight
+page <- read_html("https://en.wikipedia.org/wiki/Dead_by_Daylight")
+
+scrape <- page %>%
+  html_nodes ("table") %>% 
+  html_table(fill = TRUE) %>%
+  .[[6]]
+
+## clean dates
+scrape$date <- as.Date(scrape$`Release Date`, format = "%B %d, %Y")
+scrape$year_mon <- as.yearmon(scrape$date)
+```
+
+```{r}
+image_page <- read_html("https://deadbydaylight.fandom.com/wiki/Killers")
+
+img_links <- image_page %>%
+  html_nodes (".mw-parser-output") %>% 
+  html_nodes("div") %>%
+  html_nodes (".floatnone") %>% 
+  html_nodes("a") %>%
+  html_nodes("img") %>%
+  html_attr("src")
+
+img_titles <- image_page %>%
+  html_nodes (".mw-parser-output") %>% 
+  html_nodes("div") %>%
+  html_nodes (".floatnone") %>% 
+  html_nodes("a") %>% html_attr("title")
+
+killer_img <- data.frame(cbind(img_titles, img_links))
+killer_img <- killer_img[1:23,] # only keep relevant links
+
+## remove 'The' at the start of all names
+scrape$Killer <- gsub('^The ', '', scrape$Killer)
+
+## join images with release dates
+scrape <- scrape %>%
+  left_join(killer_img, by=c("Killer"="img_titles"))
+```
+
+
+```{r}
+games <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-16/games.csv')
+games <- games %>%
+  filter(gamename=="Dead by Daylight" ) %>%
+  mutate(month_num = match(month, month.name),
+         year_mon = paste0(year,"-",month_num),
+         year_mon = as.yearmon(year_mon),
+         avg_peak_perc = substr(avg_peak_perc, 1,nchar(avg_peak_perc)-2),
+         pos_neg = ifelse(gain>0,1,0)) 
+
+scrape <-scrape %>%
+  left_join(., games, on="year_mon") %>%
+  filter(Killer!="-")
+
+## manually re-adjust placement of some images
+scrape[scrape$Killer=="Doctor",]$pos_neg <- 0
+scrape[scrape$Killer=="Nightmare",]$pos_neg <- 0
+scrape[scrape$Killer=="Clown",]$pos_neg <- 0
+scrape[scrape$Killer=="Blight",]$pos_neg <- 1
+# write.csv(scrape, "dbd-killer-images.csv") # save dataframe
+
+scrape_img <- scrape %>%
+  mutate(avg = case_when(Killer=="Pig" ~ avg + 2000,
+                         Killer=="Legion" ~ avg + 2000,
+                         Killer=="Spirit" ~ avg + 1000,
+                         T ~ avg),
+         year_mon = case_when(Killer=="Blight" ~ year_mon + .2,
+                         Killer=="Legion" ~ year_mon + .15,
+                         Killer=="Demogorgon" ~ year_mon + .2,
+                         Killer=="Clown" ~ year_mon + .2,
+                         Killer=="Twins" ~ year_mon + .1,
+                         Killer=="Oni" ~ year_mon + .1,
+                         Killer=="Huntress" ~ year_mon - .1,
+                         Killer=="Deathslinger" ~ year_mon - .1,
+                         T ~ year_mon))
+
+asp_ratio <- 1.65
+ggplot(games, aes(year_mon , as.double(avg))) +
+  geom_point(color="white", size=2.5) + 
+  with_outer_glow(geom_line(color="white", size=.5),
+                  colour="white", expand=.2) +
+  geom_line(color="white") +
+  geom_point(data=scrape, aes(x=year_mon,y=avg),color="red", size=1.5) +
+  geom_image(data=scrape_img %>% filter(pos_neg==1),
+             aes(image=img_links, x=year_mon,y=avg+4500), size=.075,
+             by="width", asp = asp_ratio) +
+  geom_image(data=scrape_img %>% filter(pos_neg==0),
+             aes(image=img_links, x=year_mon,y=avg-4500), size=.075,
+             by="width", asp = asp_ratio) +
+  geom_segment(aes(x=2018.92,y=22500,xend=2018.92,yend=20500), color="#FAF9F6",
+               lineend='round', linejoin = 'mitre',size=.5) +
+  geom_segment(aes(x=2017.4,y=11200,xend=2017.47,yend=10500), color="#FAF9F6",
+               lineend='round', linejoin = 'mitre',size=.5) +
+  geom_segment(aes(x=2017.75,y=14300,xend=2017.75,yend=13900), color="#FAF9F6",
+               lineend='round', linejoin = 'mitre',size=.5) +
+  geom_segment(aes(x=2018,y=15400,xend=2018,yend=17500), color="#FAF9F6",
+               lineend='round', linejoin = 'mitre',size=.5) +
+  geom_segment(aes(x=2019.74,y=24400,xend=2019.7,yend=23700), color="#FAF9F6",
+               lineend='round', linejoin = 'mitre',size=.5) +
+
+  ylim(0, 47000) +
+  theme(plot.background = element_rect(fill="#1C2025", color=NA),
+        panel.background = element_rect(fill="#1C2025", color=NA),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_text(color="white"),
+        text = element_text(family="Roboto-Light", color="white"),
+        plot.title = element_text(size=21, vjust=-10, hjust=.2),
+        plot.caption = element_text(size=5),
+        plot.subtitle = element_text(vjust=-22, hjust=.15, size=10.5),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))) +
+  ggtitle('The Progression of Dead By Daylight') +
+  labs(subtitle = paste0("Exploring the game's average monthly player count with the releases of new Killer characters.\n\n"),
+       caption = "Data: SteamCharts | Created by: @kkakey") +
+  geom_richtext(aes(x=2017.8,y=43000, family ="Roboto-Light", 
+                    label=paste0("Points show monthly average player count. Red points show the month of the Killer's release in the game.<br>","2020 saw the highest average player count and the largest gain in average players occurred in March of that year,<br>as the world began shutting down due the Covid-19 pandemic. The game's max average players of 40,537 happened<br>in July 2020 - this was Dead by Daylight's 4th anniversary month and a month after the Executioner was released.")),
+                fill = NA, label.color = NA, size=3, color="white") +
+  xlab("") + ylab("Average Monthly Players") +
+  ggsave("plot.png", width=13, dpi=800)
+```
+
