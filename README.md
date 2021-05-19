@@ -6,7 +6,9 @@ Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/bl
 #### 2021-04-13 - [Post Offices](https://github.com/kkakey/tidytuesday/blob/master/2021-04-13-Post_Offices/2021-04-13-Post_Offices.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-04-13/readme.md)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-04-13-Post_Offices/post_offices.gif)
+<p align="center">
+<a href="url"><img src="https://github.com/kkakey/tidytuesday/blob/master/2021-04-13-Post_Offices/post_offices.gif" width="700" ></a>
+</p>
 
 **************************************************************************************************
 
