@@ -1,0 +1,120 @@
+---
+title: "2021-04-13-Post_Offices"
+author: "Kristen A, kkakey"
+date: "5/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(animation)
+library(ggtext)
+```
+
+```{r}
+states <- read_sf("output-data/cb_2018_us_state_500k/cb_2018_us_state_500k.shp", 
+                  crs = 2163)
+states <- states[states$STUSPS!=c("AK","HI"),]
+```
+
+```{r}
+post_offices <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-04-13/post_offices.csv')
+
+# post offices with geolocation
+po <- post_offices %>% filter(!is.na(latitude))
+# still existing post-offices
+po[is.na(po$discontinued),]$discontinued <- 2021
+
+### compute the years of operation of each post office
+## for purposes of animation, assume continuous operation
+
+po_sub <- po %>%
+  filter(!is.na(established)) %>%
+  select(established, discontinued, longitude, latitude) %>%
+  mutate(ID = row_number())
+
+full_df <- data.frame(matrix(ncol = 3, nrow = 0))
+for (i in 1:nrow(po_sub)) {
+  years <- seq(po_sub[i,]$established, po_sub[i,]$discontinued)
+  ID <- rep(po_sub[i,]$ID, length(years))
+  long <- rep(po_sub[i,]$longitude, length(years))
+  lat <- rep(po_sub[i,]$latitude, length(years))
+
+  sub_df <- data.frame(years=years, ID=ID, long=long, lat=lat)
+
+  full_df <- rbind(full_df,sub_df)
+  if (i%%10000==0) {
+    print(i)
+  }
+}
+
+# convert csv to geospatial object
+full_df_sf <- st_as_sf(full_df, coords = c("long", "lat"), crs = 4326)
+# st_write(full_df_sf, "./output-data/post_offices_timeseries.shp")
+```
+
+```{r}
+post_sf <- read_sf("./output-data/post_offices_timeseries.shp")
+
+### do some extra cleaning for simplicity of GIF visualization
+# remove IDs in AK and HI
+two_state_ID <- po %>%
+  filter(!is.na(established)) %>%
+  select(established, discontinued, longitude, latitude, state) %>%
+  mutate(ID = row_number()) %>%
+  filter(state=="HI"|state=="AK") %>%
+  pull(ID)
+post_sf2 <- post_sf %>%
+  filter(!(ID %in% two_state_ID))
+
+# remove IDs with un-real years
+weird_IDs <- post_sf2 %>%
+  filter(nchar(years)!=4) %>%
+  pull(ID)
+post_sf2 <- post_sf2 %>%
+  filter(!(ID %in% weird_IDs))
+```
+
+
+```{r}
+year_range <- seq(min(unique(post_sf2$years)), max(unique(post_sf2$years)))
+
+saveGIF({
+for (yr in year_range) {
+  
+  # get approx. total of post offices that year
+  num <- post_sf %>%
+    as.data.frame() %>%
+    filter(years==yr) %>%
+    nrow()
+  #plot
+  plot <- ggplot() +
+    geom_sf(data=states, size=.2, fill="#FAFFD8") +
+    geom_sf(data=post_sf2 %>%
+              filter(years==yr), size=.0001, alpha=.4) +
+    theme_void() +
+    theme(plot.background = element_rect(fill="#9AA899", color=NA),
+          panel.background = element_rect(fill="#9AA899", color=NA),
+          plot.title = element_text(hjust=.05),
+          plot.subtitle = element_text(hjust=.2),
+          plot.caption = element_text(size=4),
+          text = element_text(family = "AYearWithoutRain"),
+          plot.margin = unit(c(t=.2,r=.2,b=.5,l=0), "cm")) +
+    ggtitle("Post Offices in the United States") +
+    geom_richtext(aes(x=1969279,y=-2321552, label=paste0("Approximate Total: ", num)),
+                  fill = NA, label.color = NA, size=2.5,
+                  family="AYearWithoutRain") +
+    labs(subtitle = yr,
+         caption = "Data from: Blevins & Helbock\nCreated by: @kkakey\n\nTotal includes AK and HI") 
+
+  print(plot)
+}
+}, movie.name="post_offices.gif", ani.width = 1200, ani.height = 1200, interval = 0.2, 
+  nmax=350, ani.res=300, end_pause = 15)
+```
+
