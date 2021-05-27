@@ -1,5 +1,14 @@
 # tidytuesday
-Contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/README.md), a weekly social data project
+My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/README.md), a weekly social data project
+
+**************************************************************************************************
+
+#### 2021-05-25 - [Mario Kart 64 World Records](https://github.com/kkakey/tidytuesday/blob/master/2021-05-25-MarioKart64/2021-05-25-MarioKart64.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-25/readme.md)
+
+<p align="center">
+<a href="url"><img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-25-MarioKart64/plot-PAL.png" width="700" ></a>
+</p>
 
 **************************************************************************************************
 
