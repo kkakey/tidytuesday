@@ -1,0 +1,142 @@
+---
+title: "2021-06-22-Park_Access"
+author: "Kristen A, kkakey"
+date: "6/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggbump)
+library(ggtext)
+library(rvest)
+
+parks <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-06-22/parks.csv')
+```
+
+```{r}
+# clean columns
+# remove additional symbols and make numeric
+parks$park_pct_city_data <- as.integer(
+  substr(parks$park_pct_city_data, start=1, stop=nchar(parks$park_pct_city_data)-1)
+  )
+parks$pct_near_park_data <- as.integer(
+  substr(parks$pct_near_park_data, start=1, stop=nchar(parks$pct_near_park_data)-1)
+  )
+parks$spend_per_resident_data <- as.double(
+  substr(parks$spend_per_resident_data, start=2, stop=nchar(parks$spend_per_resident_data))
+  )
+```
+
+```{r}
+# scrape data on most and least populated cities in 2020
+page <- read_html("https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population")
+
+scrape <- page %>%
+  html_nodes ("table") %>% 
+  html_table(fill = TRUE) %>%
+  .[[5]]
+
+scrape$`2020estimate` <- as.integer(gsub(",", "", scrape$`2020estimate`))
+
+# remove characters in brackets
+scrape$City <- gsub(pattern ="(\\[.*?\\])", '',x=scrape$City)
+
+# normalize some city names for join
+data[data$city=="New York",]$city <- "New York City"
+data[data$city=="St. Paul",]$city <- "Saint Paul"
+data[data$city=="St. Paul",]$city <- "Saint Paul"
+scrape[scrape$City=="Arlington",]$City <- "Arlington, Texas"
+scrape[scrape$City=="Winston–Salem",]$City <- "Winston-Salem"
+scrape[scrape$City=="Washington",]$City <- "Washington, D.C."
+
+scrape <- rbind(scrape,
+      c(NA, "Charlotte/Mecklenburg County", "Virginia", 1110356, rep(NA,7)),
+      c(NA, "Arlington, Virginia", "Virginia", 189453, rep(NA,7)))
+
+scrape$`2020estimate` <- as.integer(scrape$`2020estimate`)
+
+# join population data 
+# and get most and least populated cities
+most_populated <- scrape %>%
+  select(`2020rank`,City,`2020estimate`) %>%
+  arrange(desc(`2020estimate`)) %>%
+  select(`2020rank`, City, `2020estimate`) %>%
+  left_join(., data %>%
+          rename(City = city) %>%
+          filter(year==2020), by="City" ) %>%
+  filter(!is.na(rank)) %>%
+  head(11) %>% pull(City)
+
+least_populated <- scrape %>%
+  select(`2020rank`,City,`2020estimate`) %>%
+  arrange(desc(`2020estimate`)) %>%
+  left_join(., data %>%
+          rename(City = city) %>%
+          filter(year==2020), by="City" ) %>%
+  filter(!is.na(rank)) %>%
+  tail(10) %>% pull(City)
+
+
+data <- data %>%
+  mutate(pop = case_when(city %in% most_populated ~ "most_pop",
+                         city %in% least_populated ~ "least_pop",
+                         T ~ "other")
+         )
+```
+
+
+```{r}
+data_fin <- data %>%
+  filter(!is.na(restroom_data), year>=2018) %>%
+  group_by(year) %>%
+  mutate(rank = rank(desc(restroom_data), ties.method = "random")) %>%
+  arrange(rank) %>%
+  ungroup() 
+# shorten this name for plot
+data_fin[data_fin$city=="Charlotte/Mecklenburg County",]$city <- "Charlotte/Mecklenburg"
+
+plot <- ggplot(data_fin, aes(year, rank, group = city, label = city)) +
+  geom_bump(aes(color=pop,alpha=pop)) + 
+  geom_point(aes(color=pop,alpha=pop)) +
+  geom_text(data = data_fin %>%
+    filter(!is.na(restroom_data), year==2018),
+    aes(label = city, x=2017.9, y=rank, hjust="right", color=pop), fontface = "bold",
+        family="Roboto") +
+  geom_text(data = data_fin %>%
+    filter(!is.na(restroom_data), year==2020),
+    aes(label = city, x=2020.1, y=rank, hjust="left", color=pop), fontface = "bold",
+        family="Roboto") +
+  scale_y_continuous(breaks = seq(1, 97, 1)) +
+  scale_x_continuous(breaks = seq(2018, 2020, 1),
+                     limits= c(2017, 2021.2)) +
+  coord_cartesian(ylim = c(98,0),expand = FALSE,clip = "off") +
+  theme(legend.position = "none",
+        plot.background = element_rect(fill="#BBDBB4", color=NA),
+        panel.background = element_rect(fill="#BBDBB4", color=NA),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(), 
+        plot.title = element_text(size=20, family="Roboto",
+                                  margin = unit(c(t=.2,r=0,b=.2,l=0), "cm")),
+        plot.subtitle = element_markdown(size=12, family="Roboto", 
+                                     margin = unit(c(t=-.1,r=0,b=.2,l=0), "cm"),
+                                     hjust=0),
+        plot.caption = element_markdown(family="Roboto", size=8)) +
+  xlab("") + ylab("") +
+  scale_color_manual(values = c("#F26419", "#DB3069", "grey30")) +
+  scale_alpha_manual(values = c(1,1,.5)) +
+  ggtitle("Where's the Bathroom?") +
+  labs(subtitle = paste0("<span style = 'color:black'>Ranking of cities by most restrooms in public parks per 10,000 residents<br></span>",
+  "<span style = 'color:black'>Highlighted are the </span>",
+  "<span style = 'color:#DB3069'>most </span>",
+  "<span style = 'color:black'>and </span>",
+  "<span style = 'color:#F26419'>least </span>",
+  "<span style = 'color:black'>populated cities in the dataset, as of 2020 </span>"),
+  caption = "Data: The Trust for Public Land | Created by: @kkakey")
+
+ggsave("plot.png", height=15)
+```
