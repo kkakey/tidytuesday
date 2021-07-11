@@ -3,6 +3,19 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+#### 2021-06-29 - [Animal Rescues](https://github.com/kkakey/tidytuesday/blob/master/2021-06-29-Animal_Rescues/2021-06-29-Animal_Rescues.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-06-29/readme.md)
+
+<p align="center">
+<!-- <p float="left"> -->
+  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animal_rescue.gif" width="54%" />
+  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animation2.gif" width="45%" /> 
+<!-- </p> -->
+</p>
+
+
+**************************************************************************************************
+
 #### 2021-06-23 - [Park Access](https://github.com/kkakey/tidytuesday/tree/master/2021-06-22-Park_Access) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-06-22/readme.md)
 
