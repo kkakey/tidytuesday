@@ -8,7 +8,7 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 <p align="center">
 <!-- <p float="left"> -->
-  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animal_rescue.gif" width="54%" />
+  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animal_rescue-cropped.gif" width="54%" />
   <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animation2.gif" width="45%" /> 
 <!-- </p> -->
 </p>
