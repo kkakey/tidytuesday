@@ -1,0 +1,105 @@
+---
+title: "2021-07-27_Olympics"
+author: "Kristen A, kkakey"
+date: "9/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Inspired by [kaustavSen](https://github.com/kaustavSen/tidytuesday/blob/master/2021/week_31.R)
+
+```{r}
+library(tidyverse)
+
+olympics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-07-27/olympics.csv')
+```
+
+
+```{r}
+### number of medals for the sport by country, year
+medal_count <- olympics %>%
+  filter(season=="Summer") %>%
+  group_by(year, sport, noc) %>%
+  summarise(won_medal = ifelse(!is.na(medal),1,0), .groups = 'drop',
+            medal_count = sum(won_medal)) %>%
+  ungroup()
+
+
+# top 5 countries with the most paricipants in 2016
+countries_most_participants <- olympics %>%
+  filter(season=="Summer", year==2016) %>%
+  group_by(noc) %>%
+  summarise(country_level_participation = n(), .groups = 'drop') %>%
+  arrange(desc(country_level_participation)) %>%
+  head(5) %>%
+  ungroup()
+
+
+### top 15 sports with the most participants in 2016
+top_sports_participated <- olympics %>%
+  filter(season=="Summer", year==2016) %>%
+  group_by(sport) %>%
+  summarise(country_level_participation = n(), .groups = 'drop') %>%
+  arrange(desc(country_level_participation)) %>%
+  head(15) %>% ungroup()
+
+medal_count <- medal_count %>%
+  filter(sport %in% top_sports_participated$sport,
+         noc %in% countries_most_participants$noc)
+
+# modify final dataframe
+medal_count <- medal_count %>%
+  mutate(y_var = paste(sport, noc)) %>%
+  select(year, y_var, medal_count, sport) %>%
+  distinct()
+
+# based on quantile
+medal_count$medal_count_cat <- cut(medal_count$medal_count, 
+                                   breaks = c( -1, 0,3,9,83),
+    labels = c("0", "1-3","4-9","10+"))
+
+# hacky way to add labels to one individual facet
+medal_count <- medal_count %>%
+  mutate(lab1 = ifelse(y_var=="Gymnastics FRA", "WWI", " "),
+         lab2 = ifelse(y_var=="Gymnastics FRA", "WWII", " "))
+
+
+# plot
+ggplot(medal_count, aes(x = year, y = fct_rev(y_var), fill = medal_count_cat)) +
+  geom_tile(size = 0.3, width=2.1, height=.85, color = "white") +
+  theme_minimal() +
+  facet_grid(rows = vars(sport), scales = "free", space = "free") +
+  scale_y_discrete(label=function(x) substr(x,nchar(x)-3+1, nchar(x))) +
+  scale_x_continuous(breaks = c(seq(1896, 1936, 8), seq(1948, 2016, 8)), expand = expansion(mult = 0.02)) +
+  scale_fill_manual(values=c("#bfbebf", "#5b83c2", "#1d305f","#fdd813")) +
+  guides(fill = guide_legend(label.position = "bottom",
+                                 title = "Number of total country medals", title.position = "top"))+
+  ylab("") + xlab("") +
+  # these two lines come from kaustavSen -- very helpful for adding more detail to the plot!
+  annotate("rect", xmin = 1914, xmax = 1918.25, ymin = -Inf, ymax = Inf, fill = "#D2D2D2", alpha = 0.6) +
+  annotate("rect", xmin = 1938, xmax = 1946.25, ymin = -Inf, ymax = Inf, fill = "#D2D2D2", alpha = 0.6) +
+  
+  geom_text(aes(x=1916, y=3, label=lab1), family="Roboto", fontface="bold", size=3) +
+  geom_text(aes(x=1942.5, y=3, label=lab2), family="Roboto", fontface="bold", size=3) +
+  theme(text = element_text(family="Roboto", face = "bold"),
+        legend.position = "top",
+        legend.justification = c(0.5, 0.8),
+        legend.key.width = unit(20, "mm"),
+        legend.key.height = unit(4, "mm"),
+        plot.background = element_rect(fill="#e9f0f5"),
+        panel.grid.major = element_line(color="white"),
+        panel.grid.minor = element_line(color="white"),
+        plot.title = element_text(hjust=.5, family = "Brookline", size=24,
+                                  margin = margin(t = 7, b = 3, l = 0)),
+        plot.caption = element_text(face = "plain")) +
+  ggtitle("Summer Olympic Games Medal Counts, 1896 - 2016") +
+  labs(caption = "Sports and countries were chosen based on those with the most paricipants in 2016") +
+  ggsave("plot.png", height=13, width=11)
+```
+
+
+Font:
+- [Brookline](https://www.fontspace.com/hptypework)
