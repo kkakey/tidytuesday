@@ -3,7 +3,7 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
-#### 2021-06-23 - [The Olympics](https://github.com/kkakey/tidytuesday/blob/master/2021-07-27_Olympics/2021-07-27_Olympics.Rmd) 
+#### 2021-07-27 - [The Olympics](https://github.com/kkakey/tidytuesday/blob/master/2021-07-27_Olympics/2021-07-27_Olympics.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-07-27/readme.md)
 
 <p align="center">
