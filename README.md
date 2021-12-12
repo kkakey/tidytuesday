@@ -39,7 +39,7 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-25/readme.md)
 
 <p align="center">
-img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-25-MarioKart64/plot-PAL.png" width="700" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-25-MarioKart64/plot-PAL.png" width="700" >
 </p>
 
 **************************************************************************************************
@@ -48,7 +48,7 @@ img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-25-
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-11/readme.md)
 
 <p align="center">
-img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-11-Internet_Access/plots/combined_plot-final.png" width="800" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-11-Internet_Access/plots/combined_plot-final.png" width="800" >
 </p>
 
 **************************************************************************************************
