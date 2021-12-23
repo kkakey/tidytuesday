@@ -1,0 +1,74 @@
+---
+title: "2021-12-21-Starbucks_Drinks"
+author: "Kristen A, kkakey"
+date: "12/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+```{r}
+starbucks <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-12-21/starbucks.csv')
+```
+
+```{r}
+# convert data types
+starbucks[,3:length(colnames(starbucks))] <- apply(starbucks[,3:length(colnames(starbucks))], 2, as.double)
+# clean coffee names
+starbucks$product_name <- gsub(' -', '', starbucks$product_name) 
+
+starbucks <- starbucks %>%
+  filter(size=="venti") %>%
+  select(product_name, size, caffeine_mg) %>%
+  distinct() %>%
+  # order most to least caffeine in drink, alphabetical
+  arrange(desc(caffeine_mg), product_name)
+```
+
+```{r}
+# create gradient for caffeine
+gradient_scale <- scales::seq_gradient_pal("#DBC8BD", "#34251D", "Lab")(seq(0,1,length.out=max(starbucks$caffeine_mg)+1))
+```
+
+```{r}
+plot_func <- function(i) {
+  myplots[[i]] <- ggplot() +
+    geom_rect(aes(xmin=1, xmax=2, ymin=1, ymax=2), 
+              color="black", fill=gradient_scale[starbucks$caffeine_mg[i]+1], alpha=0.9, size=1.2) +
+    geom_curve(aes(y=1.75, yend=1.25, x=2, xend=2), size=1.2, color="black", curvature = -.65) +
+    geom_text(aes(x=1.5,y=1.5,label=starbucks$caffeine_mg[i], family="Freight Sans Black"), size=7) +
+    geom_text(aes(x=1.5,y=.57,label=stringr::str_wrap(starbucks$product_name[i],23), family="Yellow Ginger"), 
+              size=5, color="white") + 
+    xlim(.5,2.5) + ylim(.2,2.5) +
+    coord_fixed(clip="off") +
+    theme_void() 
+}
+
+finalplots <- lapply(seq(1,nrow(starbucks)), plot_func)
+# combine all coffee cups together
+cowplot::plot_grid(plotlist=finalplots, greedy=F, ncol=10, rel_widths=.75, scale=1.05, rel_heights=1.05) +
+  ggsave("plot_all-ordered.png", width=25.5, height=18, bg="transparent")
+
+# final plot with title
+ggdraw() + 
+  draw_image("plot_all-ordered.png", scale = 1, x = 0,y = -.05) +
+  draw_label('I need caffeine',size=12,y=.97,x=.15,fontfamily="Yellow Ginger", color = "white") +
+  draw_label("...",size=12,y=.965,x=.245,fontfamily="Freight Sans Black", color = "white") +
+  draw_label("Milligrams of Caffeine in Venti Starbucks' Drinks",size=18,y=.9,x=.5,fontfamily="Freight Sans Black", 
+             color = "white") +
+  theme(plot.background = element_rect(fill="#036635", color=NA),
+              panel.background = element_rect(fill="#036635", color=NA))+
+  ggsave("final-ordered.png", height=6, dpi=650)
+```
+
+
+Fonts:
+- [Yellow Ginger Font](https://www.1001fonts.com/yellow-ginger-font.html)
+- [Freight Sans](https://onedesblog.com/starbucks-font/)
