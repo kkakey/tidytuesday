@@ -102,7 +102,6 @@ plot_func <- function(i) {
     theme(plot.background = element_rect(color=background_colors[i], fill=background_colors[i])) 
 }
 
-myplots <- list()
 finalplots <- lapply(seq(1,7), plot_func)
 
 cowplot::plot_grid(plotlist=finalplots, greedy=F, ncol=1) +
