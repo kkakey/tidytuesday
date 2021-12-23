@@ -3,6 +3,24 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+#### 2021-12-14 - [Starbucks drinks](https://github.com/kkakey/tidytuesday/blob/master/2021-12-21-Starbucks_Drinks/2021-12-21-Starbucks_Drinks.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-12-21/readme.md)
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-12-21-Starbucks_Drinks/final-ordered.png" width="800" >
+</p>
+
+**************************************************************************************************
+
+#### 2021-12-14 - [Spice Girls](https://github.com/kkakey/tidytuesday/blob/master/2021-12-14-Spice_Girls/2021-12-14-Spice_Girls.Rmd) 
+- [Data](https://github.com/jacquietran/spice_girls_data)
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-12-14-Spice_Girls/final-7.png" width="700" >
+</p>
+
+**************************************************************************************************
+
 #### 2021-07-27 - [The Olympics](https://github.com/kkakey/tidytuesday/blob/master/2021-07-27_Olympics/2021-07-27_Olympics.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-07-27/readme.md)
 
