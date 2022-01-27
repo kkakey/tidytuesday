@@ -3,6 +3,16 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+#### 2022-01-25 - [Board Games](https://github.com/kkakey/tidytuesday/blob/master/2022-01-25-Board_Games/2022-01-25-Board_Games.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-01-25/readme.md)
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2022-01-25-Board_Games/plot2.png" width="800" >
+</p>
+
+
+**************************************************************************************************
+
 #### 2021-12-14 - [Starbucks drinks](https://github.com/kkakey/tidytuesday/blob/master/2021-12-21-Starbucks_Drinks/2021-12-21-Starbucks_Drinks.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-12-21/readme.md)
 
