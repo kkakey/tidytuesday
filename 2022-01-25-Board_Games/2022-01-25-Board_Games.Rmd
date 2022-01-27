@@ -1,0 +1,88 @@
+---
+title: "2022-01-25-Board_Games"
+author: "Kristen A, kkakey"
+date: "1/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(colorfindr)
+library(ggtext)
+library(ggimage)
+```
+
+```{r}
+ratings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-25/ratings.csv')
+```
+
+
+Top average game rating by year
+```{r}
+top_avg_games <- ratings %>%
+  group_by(year) %>%
+  slice_max(order_by = average, n = 1) %>%
+  arrange(desc(year)) %>%
+  filter(year>1996 & year<=2021)
+```
+
+```{r}
+# extract color from thumbnail
+top_avg_games$color <- map_chr(top_avg_games$thumbnail, 
+                               function(x) get_colors(x) %>%
+                                 make_palette(., show=F, n = 3) %>% 
+                                 tail(1)
+                              )
+
+top_avg_games$y <- sort(rep(seq(0,4,1),5), decreasing=T)
+top_avg_games$x <- rep(seq(0,4,1),5)
+
+title_col <- "#F7ECE1"
+background_col <- "#650D1B" #"#E00038"
+text_col <- "#E5E238"
+```
+
+```{r}
+ggplot(data=top_avg_games) +
+  geom_rect(aes(xmin=x,xmax=x+1,ymin=y,ymax=y+1, fill=color), color="#F7ECE1", size=3) +
+  ggimage::geom_image(aes(x=x+.5,y=y+.25, image=thumbnail)) +
+  geom_text(aes(x=x+.5,y=y+.87,label=year, family="WeAreSurvivors"), color=text_col, size=8) +
+  geom_text(aes(x=x+.5,y=y+.62,label=stringr::str_wrap(name,21), 
+                # lineheight -- a life saver!
+                # https://stackoverflow.com/questions/51133569/line-spacing-for-wrapped-text-in-ggplot
+                family="WeAreSurvivors"), color=text_col, size=10, lineheight = .25) +
+  geom_text(aes(x=x+.75,y=y+.25,label=average, family="WeAreSurvivors"), color=text_col, size=8) +
+  labs(caption = "Data: Kaggle/Board Games Geek\nCreated by: @kkakey") +
+  scale_fill_identity() +
+  theme_void() +
+  theme(legend.position = "none",
+        plot.background = element_rect(fill=background_col, color=NA),
+        panel.background = element_rect(fill=background_col, color=NA),
+        plot.caption = element_text(vjust = 50, hjust=.975,
+            lineheight = .25, family="WeAreSurvivors", size=20, color = title_col)
+        ) +
+  ggtext::geom_richtext(aes(x=2.5,y=6,
+                    label=paste0("Board Games"),
+                    family="JdScarabeoRegular"),
+                    fill = NA, label.color = NA, size=75, color=title_col) +
+  ggtext::geom_richtext(aes(x=2.5,y=5.6,
+                    label=paste0("with the Highest Average Rating"),
+                    family="JdScarabeoRegular"),
+                    fill = NA, label.color = NA, size=50, color=title_col) +
+  ggtext::geom_richtext(aes(x=2.5,y=5.25,
+                    label=paste0("1997 - 2021"),
+                    family="JdScarabeoRegular"),
+                    fill = NA, label.color = NA, size=50, color=title_col)
+  
+ggsave("plot2.png", width=7, height=7, dpi=400)
+```
+
+
+Fonts:
+- [We Are Survivors](https://demofont.com/we-are-survivors-font/)
+- [Jd Scarabeo Regular](https://www.ffonts.net/JD-Scarabeo-Regular.font)
+
