@@ -10,6 +10,15 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2022-01-25-Board_Games/plot2.png" width="800" >
 </p>
 
+**************************************************************************************************
+
+#### 2022-01-11 - [Bee Colony losses](https://github.com/kkakey/tidytuesday/blob/master/2022-01-11-Bee_Colony_losses/2022-01-11-Bee_Colony_losses.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-01-11/readme.md)
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2022-01-11-Bee_Colony_losses/final.png" width="800" >
+</p>
+
 
 **************************************************************************************************
 
