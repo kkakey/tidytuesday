@@ -77,7 +77,7 @@ p <- hex %>%
                         "<span style = 'color:black'>","states exceede 100% net difference","</span>"
                         ),
        title = "Bee Colonies",
-       subtitle = "Net Gain or Loss of from 2015 to 2021 Across the U.S") 
+       subtitle = "Net Gain or Loss from 2015 to 2021 Across the U.S") 
 
 # ggsave(plot=p,"plot.png")
 ```
