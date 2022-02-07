@@ -31,113 +31,113 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
-#### 2021-12-14 - [Spice Girls](https://github.com/kkakey/tidytuesday/blob/master/2021-12-14-Spice_Girls/2021-12-14-Spice_Girls.Rmd) 
+#### 2021-12-14 - [Spice Girls](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-12-14-Spice_Girls/2021-12-14-Spice_Girls.Rmd) 
 - [Data](https://github.com/jacquietran/spice_girls_data)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-12-14-Spice_Girls/final-7.png" width="700" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-12-14-Spice_Girls/final-7.png" width="700" >
 </p>
 
 **************************************************************************************************
 
-#### 2021-07-27 - [The Olympics](https://github.com/kkakey/tidytuesday/blob/master/2021-07-27_Olympics/2021-07-27_Olympics.Rmd) 
+#### 2021-07-27 - [The Olympics](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-07-27_Olympics/2021-07-27_Olympics.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-07-27/readme.md)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-07-27_Olympics/plot.png" width="700" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-07-27_Olympics/plot.png" width="700" >
 </p>
 
 
 **************************************************************************************************
 
-#### 2021-06-29 - [Animal Rescues](https://github.com/kkakey/tidytuesday/blob/master/2021-06-29-Animal_Rescues/2021-06-29-Animal_Rescues.Rmd) 
+#### 2021-06-29 - [Animal Rescues](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-06-29-Animal_Rescues/2021-06-29-Animal_Rescues.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-06-29/readme.md)
 
 <p align="center">
 <!-- <p float="left"> -->
-  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animal_rescue-cropped.gif" width="54%" />
-  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-29-Animal_Rescues/animation2.gif" width="45%" /> 
+  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-06-29-Animal_Rescues/animal_rescue-cropped.gif" width="54%" />
+  <img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-06-29-Animal_Rescues/animation2.gif" width="45%" /> 
 <!-- </p> -->
 </p>
 
 
 **************************************************************************************************
 
-#### 2021-06-23 - [Park Access](https://github.com/kkakey/tidytuesday/tree/master/2021-06-22-Park_Access) 
+#### 2021-06-23 - [Park Access](https://github.com/kkakey/tidytuesday/tree/master/2021/2021-06-22-Park_Access) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-06-22/readme.md)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-06-22-Park_Access/plot.png" width="400" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-06-22-Park_Access/plot.png" width="400" >
 </p>
 
 **************************************************************************************************
 
-#### 2021-05-25 - [Mario Kart 64 World Records](https://github.com/kkakey/tidytuesday/blob/master/2021-05-25-MarioKart64/2021-05-25-MarioKart64.Rmd) 
+#### 2021-05-25 - [Mario Kart 64 World Records](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-05-25-MarioKart64/2021-05-25-MarioKart64.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-25/readme.md)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-25-MarioKart64/plot-PAL.png" width="700" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-05-25-MarioKart64/plot-PAL.png" width="700" >
 </p>
 
 **************************************************************************************************
 
-#### 2021-05-11 - [U.S Broadband](https://github.com/kkakey/tidytuesday/blob/master/2021-05-11-Internet_Access/2021-05-11-Internet_Access.Rmd) 
+#### 2021-05-11 - [U.S Broadband](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-05-11-Internet_Access/2021-05-11-Internet_Access.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-11/readme.md)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-05-11-Internet_Access/plots/combined_plot-final.png" width="800" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-05-11-Internet_Access/plots/combined_plot-final.png" width="800" >
 </p>
 
 **************************************************************************************************
 
-#### 2021-04-13 - [Post Offices](https://github.com/kkakey/tidytuesday/blob/master/2021-04-13-Post_Offices/2021-04-13-Post_Offices.Rmd) 
+#### 2021-04-13 - [Post Offices](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-04-13-Post_Offices/2021-04-13-Post_Offices.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-04-13/readme.md)
 
 <p align="center">
-<img src="https://github.com/kkakey/tidytuesday/blob/master/2021-04-13-Post_Offices/post_offices.gif" width="700" >
+<img src="https://github.com/kkakey/tidytuesday/blob/master/2021/2021-04-13-Post_Offices/post_offices.gif" width="700" >
 </p>
 
 **************************************************************************************************
 
-#### 2021-03-16 - [Video Games](https://github.com/kkakey/tidytuesday/blob/master/2021-03-15-Video_Games/2021-03-15_Video-Games.Rmd) 
+#### 2021-03-16 - [Video Games](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-03-15-Video_Games/2021-03-15_Video-Games.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-16/readme.md)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-03-15-Video_Games/plot.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-03-15-Video_Games/plot.png)
 
 
 **************************************************************************************************
 
-#### 2021-03-02 - [Superbowl Ads](https://github.com/kkakey/tidytuesday/blob/master/2021-03-02-Superbowl_Ads/2021-03-02_Superbowl-Ads.Rmd) 
+#### 2021-03-02 - [Superbowl Ads](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-03-02-Superbowl_Ads/2021-03-02_Superbowl-Ads.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-02/readme.md)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-03-02-Superbowl_Ads/plot2.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-03-02-Superbowl_Ads/plot2.png)
 
 **************************************************************************************************
 
-#### 2021-02-16 - [DuBois Challenge](https://github.com/kkakey/tidytuesday/blob/master/2021-02-16-DuBois_Challenge/2021-02-16-DuBois_Challenge.Rmd) 
+#### 2021-02-16 - [DuBois Challenge](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-02-16-DuBois_Challenge/2021-02-16-DuBois_Challenge.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-16/readme.md)
 - Original visualization [here](https://raw.githubusercontent.com/ajstarks/dubois-data-portraits/master/challenge/challenge07/original-plate-25.jpg)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-02-16-DuBois_Challenge/plot.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-02-16-DuBois_Challenge/plot.png)
 
 **************************************************************************************************
 
-#### 2021-01-19 - [Kenya Census](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/2021-01-19-Kenya_Census.Rmd) 
+#### 2021-01-19 - [Kenya Census](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-01-19-Kenya_Census/2021-01-19-Kenya_Census.Rmd) 
 - [Data](https://github.com/sharlagelfand/opendatatoronto)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-19-Kenya_Census/plot2.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-01-19-Kenya_Census/plot2.png)
 
 **************************************************************************************************
 
-#### 2021-01-12 - [Tate Art Collection](https://github.com/kkakey/tidytuesday/blob/master/2021-01-12_Tate-Art/2020-01-12_Tate-Art.Rmd) 
+#### 2021-01-12 - [Tate Art Collection](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-01-12_Tate-Art/2020-01-12_Tate-Art.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-01-19/readme.md)
 
-![](https://github.com/kkakey/tidytuesday/blob/master/2021-01-12_Tate-Art/plot.png)
+![](https://github.com/kkakey/tidytuesday/blob/master/2021/2021-01-12_Tate-Art/plot.png)
 
 interactive plot [here](https://kka2120.shinyapps.io/tate-art)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-01-12_Tate-Art/shiny_img.png" width="500" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-01-12_Tate-Art/shiny_img.png" width="500" >
 </p>
 
 
