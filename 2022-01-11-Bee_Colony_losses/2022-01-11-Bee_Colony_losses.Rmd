@@ -1,0 +1,142 @@
+---
+title: "2022-02-06-Bee_Colony_losses"
+author: "Kristen A, kkakey"
+date: "1/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(ggtext)
+library(patchwork)
+```
+
+```{r}
+colony <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/colony.csv')
+hex <- read_sf("./raw-data/us_hex_islands1.shp")
+```
+
+```{r}
+net_gain_or_lost_2015_2021 <- colony %>%
+  mutate(months_year = paste(months, year)) %>% 
+  filter(months_year %in% c("April-June 2015", "April-June 2021")) %>%
+  group_by(state) %>%
+  arrange(state) %>%
+  mutate(colony_n_2015 = lag(colony_n, n = 1, default = NA),
+         net_gain_or_lost = (colony_n-colony_n_2015),
+         net_gain_or_lost_pct = round(net_gain_or_lost/colony_n,4),
+         net_gain_or_lost_pct_rd = case_when(
+                                    net_gain_or_lost_pct < -1 ~ -1,
+                                    T ~ net_gain_or_lost_pct
+                                  )) %>%
+  filter(!is.na(net_gain_or_lost_pct)) %>%
+  ungroup()
+
+most_desc <- net_gain_or_lost_2015_2021 %>%
+  filter(state!="Other States",
+         net_gain_or_lost_pct < -1) %>%
+  select(state, colony_n_2015, colony_n, net_gain_or_lost, net_gain_or_lost_pct)
+
+most_improved <- net_gain_or_lost_2015_2021 %>%
+  slice_max(order_by = net_gain_or_lost_pct,n = 4) %>%
+  select(state, colony_n_2015, colony_n, net_gain_or_lost, net_gain_or_lost_pct)
+
+d <- net_gain_or_lost_2015_2021 %>%
+  ungroup() %>%
+  select(state, colony_n_2015, colony_n, net_gain_or_lost, net_gain_or_lost_pct)
+```
+
+```{r}
+p <- hex %>%
+  left_join(., net_gain_or_lost_2015_2021, by=c("State"="state")) %>%
+  ggplot() +
+  geom_sf(aes(fill=net_gain_or_lost_pct_rd), color="black") +
+  scale_fill_gradient2(low = "#373F51", mid = "white",
+        high = "#FFAD0A", midpoint = 0, space = "Lab",
+        na.value = "#9D7758", limit = c(-1,1), breaks = c(-1,-.5,.5, 1), 
+        labels = c( "-100+%", "-50%", "50%", "100%"),
+        name = "") +
+  guides(fill = guide_colorbar(ticks.colour = "black")) +
+  geom_sf(data = hex %>% filter(State %in% most_desc$state), color="white", fill=NA) +
+  geom_sf_text(aes(label=State_Abbr)) +
+  theme_void() +
+  theme(plot.background = element_rect(fill="#684F3B", color=NA),
+        panel.background = element_rect(fill="#684F3B", color=NA),
+        text = element_text(family="Poppins"),
+        plot.title = element_text(hjust=.15, size=15),
+        plot.subtitle = element_text(hjust=.25, size=13.5),
+        plot.caption = element_markdown(hjust=.9),
+        legend.position = c(.9, 0.2)
+        ) +
+  labs(caption = paste0("<span style = 'color:white'>","Outlined ","</span>",
+                        "<span style = 'color:black'>","states exceede 100% net difference","</span>"
+                        ),
+       title = "Bee Colonies",
+       subtitle = "Net Gain or Loss of from 2015 to 2021 Across the U.S") 
+
+# ggsave(plot=p,"plot.png")
+```
+
+```{r}
+upperbound <- 105000
+
+p2 <- d %>%
+  filter(colony_n_2015 <= upperbound) %>%
+    mutate(cat_states = case_when(state %in% most_desc$state ~ "states_worst",
+                                  state %in% most_improved$state ~ "states_improved",
+                                  T ~ "Other"),
+           net_gain_or_lost_pct = case_when(net_gain_or_lost_pct>0 ~ paste0("+", net_gain_or_lost_pct*100, "%"),
+                                  T ~ paste0(net_gain_or_lost_pct*100, "%"))) %>%
+  arrange(cat_states) %>%
+ggplot(.) +
+  geom_segment(aes(x=0,xend=9,y=colony_n_2015,yend=colony_n, 
+                   color=as.factor(cat_states), size=as.factor(cat_states))) +
+  geom_text(aes(x=0,y=-1200,label="2015", family="Poppins"), size=3) +
+  geom_text(aes(x=9,y=-1200,label="2021", family="Poppins"), size=3) +
+  geom_text(data=. %>% filter(state %in% most_desc$state), 
+            aes(x=9.1, y=colony_n,label=str_wrap(paste(state, net_gain_or_lost_pct),16), 
+                family="Poppins"), size = 3, lineheight = .85, hjust = 0, color="#669BBC") +
+  geom_text(data=. %>% filter(state %in% most_improved$state), 
+            aes(x=9.1, y=ifelse(state=="New Jersey", colony_n-1500,colony_n),
+                label=str_wrap(paste(state, net_gain_or_lost_pct),16), 
+                family="Poppins"), size = 3, lineheight = .85, hjust = 0, color="#FFAD0A") +
+  scale_color_manual(values=c("grey50","#FFAD0A","#669BBC")) +
+  scale_size_manual(values=c(.6,1,1)) +
+  scale_y_continuous(limits = c(-1500, upperbound), 
+                     breaks = seq(0, upperbound, by = 10000),
+                     label=scales::comma) +
+  xlim(0,11) +
+  theme(text = element_text(family="Poppins"),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(color="black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_line(color="black"),
+        panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill="#684F3B", color=NA),
+        panel.background = element_rect(fill="#684F3B", color=NA),
+        legend.position = "none",
+        plot.caption = element_text(size = 8)) +
+  xlab("") + ylab("") +
+  coord_cartesian(clip="off", expand=F) +
+  labs(caption = "Data shown in the slope plot represents 41 of the 47 states with available data\nBee icons from MCICON")
+
+# ggsave("slopeplot.png", height=10, width=5)
+```
+
+```{r}
+full_patch <- p / p2 + 
+  plot_annotation(theme = theme(
+    plot.margin = margin(t=.8, r=0, b=.1, l=0, "cm"),
+    plot.background = element_rect(fill="#684F3B", color=NA),
+    panel.background = element_rect(fill="#684F3B", color=NA)
+    )
+  ) 
+ggsave(plot=full_patch, "final.png", height=18, width=8)
+```
+
+- Bee icon from https://www.mcicon.com/product/bee-icon/
