@@ -74,10 +74,10 @@ p <- hex %>%
         legend.position = c(.9, 0.2)
         ) +
   labs(caption = paste0("<span style = 'color:white'>","Outlined ","</span>",
-                        "<span style = 'color:black'>","states exceede 100% net difference","</span>"
+                        "<span style = 'color:black'>","states exceeded 100% net difference","</span>"
                         ),
        title = "Bee Colonies",
-       subtitle = "Net Gain or Loss from 2015 to 2021 Across the U.S") 
+       subtitle = "Net Gain or Loss from 2015 to 2021 Across the United States") 
 
 # ggsave(plot=p,"plot.png")
 ```
