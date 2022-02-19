@@ -3,6 +3,16 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+### The data I wrangled on American Kennel Club dog breeds ([repo here](https://github.com/kkakey/dog_traits_AKC)) was used for week 5, [2022-02-01](https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-02-01/readme.md), of TidyTuesday! 
+
+<p align="center">
+<img src="https://media-cldnry.s-nbcnews.com/image/upload/newscms/2020_28/1587661/dogs-age-years-kb-inline-200707.jpg" alt="image of five puppies sitting and looking at camera with a white background" width="300" >
+  </p>
+
+Check it out [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-02-01/readme.md) and all the amazing visualizations people made that week at #TidyTuesday on Twitter.
+
+**************************************************************************************************
+
 #### 2022-01-25 - [Board Games](https://github.com/kkakey/tidytuesday/blob/master/2022-01-25-Board_Games/2022-01-25-Board_Games.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-01-25/readme.md)
 
