@@ -36,7 +36,7 @@ Check it out [here](https://github.com/rfordatascience/tidytuesday/blob/master/d
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-12-21/readme.md)
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021-12-21-Starbucks_Drinks/final-ordered.png" width="800" >
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2021/2021-12-21-Starbucks_Drinks/final-ordered.png" width="800" >
 </p>
 
 **************************************************************************************************
