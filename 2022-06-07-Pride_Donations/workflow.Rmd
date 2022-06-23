@@ -1,0 +1,231 @@
+---
+title: "20220607-Pride_Donations-Process"
+author: "Kristen A, kkakey"
+date: "6/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This Rmarkdown includes code and thoughts of my TidyTuesday process for 20220607! I don't include all the code I used, since this process is very iterative, but 5 general visualization stages for this week's TT.
+
+This is for the NYC R-Ladies Code-laboration event https://www.meetup.com/rladies-newyork/events/286558385/
+
+*********************************************
+
+Example TidyTuesdays (with code) for this week:
+
+- @issa_madjid https://twitter.com/issa_madjid/status/1534268235780063235
+- @XuehuaiH https://twitter.com/XuehuaiH/status/1534331511532421121
+- @danoehm https://twitter.com/danoehm/status/1535051951750414336
+
+
+*********************************************
+
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+pride_aggregates <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/pride_aggregates.csv')
+fortune_aggregates <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/fortune_aggregates.csv')
+static_list <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/static_list.csv')
+pride_sponsors <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/pride_sponsors.csv')
+corp_by_politician <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/corp_by_politician.csv')
+donors <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/donors.csv')
+```
+
+**exploratory data analysis**
+
+- What data is available? 
+- What questions can you ask with the data available? 
+- What are some interesting trends?
+
+
+note: I didn't include all my code chunks exploring the various datasets, but that's where I always start!
+
+What I decided to look at: Pride sponsors who have donated to Anti-LQBTQ Campaigns
+```{r}
+static_list %>%
+  filter(`Pride?`==TRUE) #%>%
+  # summarize(quantile(`Amount Contributed Across States`))
+```
+
+
+```{r}
+### Sum of donations contributed to anti-LBGTQ politicians by pride sponsors
+pride_aggregates %>%
+  filter(Company=="Grand Total")
+```
+
+
+*********************************************
+
+- "Circular packing or circular treemap allows to visualize a hierarchic organization. It is an equivalent of a treemap or a dendrogram, where each node of the tree is represented as a circle and its sub-nodes are represented as circles inside of it." (https://r-graph-gallery.com/circle-packing.html)
+- "A Treemap displays hierarchical data as a set of nested rectangles. Each group is represented by a rectangle, which area is proportional to its value." (https://r-graph-gallery.com/treemap.html)
+
+```{r}
+## https://r-graph-gallery.com/circle-packing.html
+## https://r-graph-gallery.com/305-basic-circle-packing-with-one-level.html
+install.packages('packcircles')
+library(packcircles)
+```
+
+
+```{r}
+set.seed(99)
+anti_lgbt <- static_list %>%
+  filter(`Pride?`==TRUE) %>%
+  # randomly reorder columns
+  .[sample(1:nrow(.)), ]
+
+packing <- circleProgressiveLayout(anti_lgbt$`Amount Contributed Across States`, sizetype='area')
+packing$radius <- 0.95*packing$radius # adds space around circles
+anti_lgbt <- cbind(anti_lgbt, packing)
+anti_lgbt.gg <- circleLayoutVertices(packing, npoints=500)
+```
+
+```{r}
+# modify text in circles 
+anti_lgbt <- anti_lgbt %>%
+  mutate(text = paste0(Company, '\n', "$", scales::comma(`Amount Contributed Across States`)))
+```
+
+```{r}
+ggplot() + 
+  
+  # Make the bubbles
+  geom_polygon(data = anti_lgbt.gg, aes(x, y, group = id, fill=as.factor(id)), colour = "black", alpha = 0.6) +
+  
+  # Add text in the center of each bubble + control its size
+  geom_text(data = anti_lgbt, aes(x, y, size=`Amount Contributed Across States`/2, label = text)) +
+  scale_size_continuous(range = c(2,5)) +
+  
+  # General theme:
+  # theme_void() + 
+  theme(legend.position="none") +
+  coord_equal() 
+
+ggsave("test1.png")
+```
+
+
+
+****************
+
+```{r}
+anti_lgbt <- static_list %>%
+  filter(`Pride?`==TRUE) 
+
+packing <- circleProgressiveLayout(anti_lgbt$`Amount Contributed Across States`, sizetype='area')
+packing$radius <- 0.9*packing$radius 
+anti_lgbt <- cbind(anti_lgbt, packing)
+anti_lgbt.gg <- circleLayoutVertices(packing, npoints=20)
+```
+
+```{r}
+anti_lgbt <- anti_lgbt %>%
+  mutate(
+     id = row_number(),
+     text = paste0(Company, '\n', "$", scales::comma(`Amount Contributed Across States`))
+  )
+```
+
+```{r}
+ggplot() + 
+  
+  # Make the bubbles
+  geom_polygon(data = anti_lgbt.gg, aes(x, y, group = id, fill=as.factor(id)), colour = "black", alpha = 0.6) +
+  
+  # Add text in the center of each bubble + control its size
+  geom_text(data = anti_lgbt, aes(x, y, size=`Amount Contributed Across States`, label = text), 
+            family = "Open Sans") +
+  scale_size_continuous(range = c(2,5)) +
+  
+  # General theme:
+  theme_void() + 
+  theme(legend.position="none") +
+  coord_equal() 
+
+
+ggsave("test3.png")
+```
+
+
+****************
+
+```{r}
+anti_lgbt <- static_list %>%
+  filter(`Pride?`==TRUE) 
+
+packing <- circleProgressiveLayout(anti_lgbt$`Amount Contributed Across States`, sizetype='area')
+packing$radius <- 0.9*packing$radius # adds space around circles
+anti_lgbt <- cbind(anti_lgbt, packing)
+## increase the circle resolution
+anti_lgbt.gg <- circleLayoutVertices(packing, npoints=700)
+```
+
+```{r}
+anti_lgbt <- anti_lgbt %>%
+  mutate(
+     id = row_number(),
+     text = paste0(stringr::str_wrap(Company,12), '\n', "$", scales::comma(`Amount Contributed Across States`)),
+     ## change the fill color
+     fill_col = rainbow(30)
+  )
+
+anti_lgbt.gg <- anti_lgbt.gg %>%
+  left_join(., anti_lgbt %>% select(!c(x,y)), by = "id")
+```
+
+
+```{r}
+ggplot() + 
+  geom_polygon(data = anti_lgbt.gg, aes(x, y, group = id, fill=as.factor(fill_col)), colour = "black", alpha = 0.6) +
+  scale_fill_identity() +
+  ## don't include text for the smaller circles
+  geom_text(data = anti_lgbt[anti_lgbt$`Amount Contributed Across States`>10000,], 
+            aes(x, y, size=`Amount Contributed Across States`, label = text, lineheight = 1), 
+            family = "Roboto", color = "white") +
+  scale_size_continuous(range = c(2,5)) +
+  theme_void() + 
+  theme(legend.position="none") +
+  coord_equal() 
+
+
+ggsave("test4.png")
+```
+
+
+**************************************************
+
+```{r}
+ggplot() + 
+  geom_polygon(data = anti_lgbt.gg, aes(x, y, group = id, fill=as.factor(fill_col)), 
+               colour = "black", alpha = 0.6) +
+  scale_fill_identity() +
+  geom_text(data = anti_lgbt[anti_lgbt$`Amount Contributed Across States`>10000,], 
+            aes(x, y, size=`Amount Contributed Across States`, label = text, lineheight = 1,
+                family = "Roboto"), color = "white") +
+  scale_size_continuous(range = c(1,4)) +
+  theme_void() +
+  theme(legend.position="none",
+        panel.background = element_rect(fill="#36454F", color=NA),
+        plot.background = element_rect(fill="#36454F", color=NA),
+        plot.title = element_text(family = "JosefinSans-SemiBold", 
+                                  color = "white", hjust=.5, #vjust=2.3,
+                                  margin = margin(t = 10, b = 0, l = 0)),
+        plot.caption = element_text(family = "JosefinSans-SemiBold", size = 3, color = "white",
+                                    hjust=.99, vjust = 8)) +
+  ggtitle("PRIDE SPONSORS\nWho Also Donated To\nANTI-LGBTQ CAMPAIGNS") +
+  labs(caption = "Data: Data For Progress\nCreated by: @kkakey") +
+  coord_equal() 
+
+ggsave("test5.png", height = 5, width = 5, dpi = 300)
+```
+
+
+
