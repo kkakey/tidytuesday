@@ -1,0 +1,69 @@
+---
+title: "20220607-Pride_Donations"
+author: "Kristen A, kkakey"
+date: "6/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(packcircles)
+```
+
+```{r}
+static_list <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-07/static_list.csv')
+```
+
+```{r}
+anti_lgbt <- static_list %>%
+  filter(`Pride?`==TRUE) 
+
+## https://r-graph-gallery.com/305-basic-circle-packing-with-one-level.html
+packing <- circleProgressiveLayout(anti_lgbt$`Amount Contributed Across States`, sizetype='area')
+packing$radius <- 0.9*packing$radius 
+anti_lgbt <- cbind(anti_lgbt, packing)
+anti_lgbt.gg <- circleLayoutVertices(packing, npoints=700)
+##
+
+anti_lgbt <- anti_lgbt %>%
+  mutate(
+     id = row_number(),
+     text = paste0(stringr::str_wrap(Company,12), '\n', "$", 
+                   scales::comma(`Amount Contributed Across States`)),
+     fill_col = rainbow(30)
+  )
+
+anti_lgbt.gg <- anti_lgbt.gg %>%
+  left_join(., anti_lgbt %>% select(!c(x,y)), by = "id")
+```
+
+```{r}
+ggplot() + 
+  geom_polygon(data = anti_lgbt.gg, aes(x, y, group = id, fill=as.factor(fill_col)), 
+               colour = "black", alpha = 0.6) +
+  scale_fill_identity() +
+  geom_text(data = anti_lgbt[anti_lgbt$`Amount Contributed Across States`>10000,], 
+            aes(x, y, size=`Amount Contributed Across States`, label = text, lineheight = 1,
+                family = "Roboto"), color = "white") +
+  scale_size_continuous(range = c(1,4)) +
+  theme_void() +
+  theme(legend.position="none",
+        panel.background = element_rect(fill="#36454F", color=NA),
+        plot.background = element_rect(fill="#36454F", color=NA),
+        plot.title = element_text(family = "JosefinSans-SemiBold", 
+                                  color = "white", hjust=.5, 
+                                  margin = margin(t = 10, b = 0, l = 0)),
+        plot.caption = element_text(family = "JosefinSans-SemiBold", size = 3, color = "white",
+                                    hjust=.99, vjust = 8)) +
+  ggtitle("PRIDE SPONSORS\nWho Also Donated To\nANTI-LGBTQ CAMPAIGNS") +
+  labs(caption = "Data: Data For Progress\nCreated by: @kkakey") +
+  coord_equal() 
+
+ggsave("plot.png", height = 5, width = 5, dpi = 300)
+```
+
