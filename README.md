@@ -3,6 +3,15 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+#### 2022-06-25 - [Pride Donations]([https://github.com/kkakey/tidytuesday/blob/master/2022-01-25-Board_Games/2022-01-25-Board_Games.Rmd](https://github.com/kkakey/tidytuesday/blob/master/2022-06-07-Pride_Donations/2022-06-07-Pride_Donations.Rmd)) 
+- [Data]([https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-01-25/readme.md](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-06-07))
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/master/2022-06-07-Pride_Donations/plot.png" width="600" >
+</p>
+
+**************************************************************************************************
+
 ### The data I wrangled on American Kennel Club dog breeds ([repo here](https://github.com/kkakey/dog_traits_AKC)) was used for week 5, [2022-02-01](https://github.com/rfordatascience/tidytuesday/blob/master/data/2022/2022-02-01/readme.md), of TidyTuesday! 
 
 <p align="center">
