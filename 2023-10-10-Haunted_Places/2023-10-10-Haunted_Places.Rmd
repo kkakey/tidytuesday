@@ -1,0 +1,274 @@
+---
+title: "2023-10-10-Haunted_Places"
+output: html_document
+date: "2023-10-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(jsonlite)
+sf_use_s2(FALSE) # https://github.com/r-spatial/sf/issues/1762
+data(county_laea)
+data(state_laea, state)
+proj_crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+county_laea = st_transform(county_laea, proj_crs)
+state_laea = st_transform(state_laea, proj_crs)
+```
+
+```{r}
+get_image_url <- function(location, city) {
+  place <- glue::glue('{location} {city}, California')
+  place <- stringr::str_replace_all(place, ' ', '_')
+  # search
+  res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{location}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    print(glue::glue("place: {place}"))
+    # search
+    r <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+    print(r)
+    title <- r$query$search$title[1]
+    print(glue::glue("title: {title}"))
+  }
+  # get title
+  title <- res$query$search$title[1]
+  print(glue::glue("title: {title}"))
+  title <- stringr::str_replace_all(title, ' ', '%20')
+  # get image
+  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                                 "piprop=original&titles={title}"))
+  # get image url
+  img_url <- img_res$query$pages[[1]]$original$source
+  print(img_url)
+  return(coalesce(img_url, 'NA'))
+}
+```
+
+```{r}
+    place <- glue::glue('Mentryville, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+
+  print(place)
+  # get title
+  title <- res$query$search$title[1]
+  title <- stringr::str_replace_all(title, ' ', '%20')
+  print(glue::glue("title: {title}"))
+  # get image
+  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                                 "piprop=original&titles={title}"))
+  # get image url
+  img_url <- img_res$query$pages[[1]]$original$source
+```
+
+
+```{r}
+haunted_places <- 
+  readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-10-10/haunted_places.csv')
+
+haunted_places_county <-
+  haunted_places %>%
+  mutate(longitude = ifelse(is.na(longitude) & is.na(latitude), city_longitude, longitude),
+         latitude = ifelse(is.na(longitude) & is.na(latitude), city_latitude, latitude),
+         # if lat is still missing, replacing both lat/long for city coordinates
+         longitude = ifelse(is.na(latitude), city_longitude, longitude),
+         latitude = ifelse(is.na(latitude), city_latitude, latitude),
+         ) %>%
+  filter(!is.na(longitude)) %>%
+  st_as_sf(x = ., 
+          coords = c("longitude", "latitude"),
+          crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+          ) %>%
+  st_intersection(., county_laea)
+    
+most_haunted_counties <-
+  haunted_places_county %>%
+  group_by(GEOID) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  head(10)
+  
+fips = most_haunted_counties[1,1]$GEOID
+
+haunted_places_county <- 
+  haunted_places_county %>% 
+  filter(GEOID == fips)
+
+most_counted_county <-
+  county_laea %>%
+  filter(GEOID == fips)
+
+state <-
+  state_laea %>%
+  filter(GEOID == substr(fips, 1,2))
+
+# bbox = st_bbox(most_counted_county) 
+# ggplot() + 
+#   geom_sf(data = state, fill = "#181C39") +
+#   geom_sf(data = most_counted_county, fill = "#262A56") +
+#   geom_sf(data = streets, size=.05) +
+#   geom_sf(data = haunted_places_county %>% filter(GEOID == fips), 
+#           size=1, color="#B8621B", alpha=.4) +
+#   coord_sf(
+#     xlim = c(bbox['xmin'], bbox['xmax']),
+#     ylim = c(33.68, bbox['ymax']+.3), clip = "off"
+#   ) +
+#   theme_void() +
+#   theme(plot.background = element_rect(fill = "#000000", color = NA))
+# ggsave("haunted_county.png", dpi=600, width = 6, height=4, units="in")
+
+
+########################
+### write out data
+########################
+# write_sf(haunted_places_county, "./output_data/haunted_places_county.shp")
+# 
+# state_filter <- st_difference(state, most_counted_county)
+# write_sf(state_filter, "./output_data/state_filter.shp")
+```
+
+
+```{r}
+haunted_places_county
+
+
+out <- get_image_url('Taft High School Woodland Hills, California')
+
+
+out_url <-
+  haunted_places_county %>% 
+  filter(state_abbrev == 'CA') %>%
+  mutate(img_url = purrr::map2_chr(location, city, ~get_image_url(.x, .y)))
+
+  haunted_places_county %>% 
+  filter(state_abbrev == 'CA') %>%
+  .[15,]
+
+
+
+l <- 
+  haunted_places_county %>%
+  filter(state_abbrev == 'CA') %>%
+  as.data.frame() %>%
+  transmute(place = glue::glue('{location} {city}, {state}'))
+
+vec <- c()
+for ( i in as.vector(l[[1]])) {
+  out <- get_image_url(i)
+  print(out)
+  vec <- c(vec, out)
+}
+
+```
+
+```{r}
+  p <- 'Stevenson Ranch Mettryville, California'
+  place <- stringr::str_replace_all(p, ' ', '_')
+  # search
+  res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  # get title
+  title <- res$query$search$title[1]
+  title <- stringr::str_replace_all(title, ' ', '%20')
+  # get image
+  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                                 "piprop=original&titles={title}"))
+  # get image url
+  img_url <- img_res$query$pages[[1]]$original$source
+  coalesce(img_url, NA)
+```
+
+
+
+
+
+```{r}
+library(jsonlite)
+MySearch <- function(srsearch){
+  FullSearchString <- paste("http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=",srsearch,"&format=json",sep="")
+  Response <- fromJSON(FullSearchString)
+  return(Response)
+}
+Response <- MySearch("Richard%20Dawkins")
+
+
+
+response <- fromJSON(paste("http://en.wikipedia.org/w/api.php?action=query&titles=","Albert%20Einstein","&format=json&prop=images",sep=""))
+
+
+response <- fromJSON('https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Sample.png&width=300')
+
+qurl = "https://www.swissbiopics.org/api/image/Chlamydomona_cells.svg"
+fl = file.path(tempdir(), basename(qurl))
+download.file(qurl, fl)
+img = magick::image_read_svg(fl)
+print(img)
+
+library(rsvg)
+library(magick)
+tiger <- magick::image_read("https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Valley_Steam_Plant_from_the_southwest-_March_2022.jpg/600px-Valley_Steam_Plant_from_the_southwest-_March_2022.jpg")
+print(tiger)
+
+
+http://en.wikipedia.org/w/api.php?action=query&titles=Al-Farabi&prop=pageimages&format=json&pithumbsize=100
+
+# res = fromJSON("http://en.wikipedia.org/w/api.php?action=query&titles=Wisconsin-Rapids&prop=pageimages&format=json&pithumbsize=300")
+
+res = fromJSON("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=Wisconsin")
+
+
+
+
+
+res %>% as.data.frame %>% .[1,5]
+res$query$pages[1]
+tiger <- magick::image_read("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Alpharabius_in_Liber_Chronicarum_1493_AD.png/100px-Alpharabius_in_Liber_Chronicarum_1493_AD.png")
+
+
+list=search&srsearch=
+print(tiger)
+```
+
+
+
+
+
+
+
+```{r}
+# library(leaflet)
+# leaflet() %>%
+#   addProviderTiles("Stadia.AlidadeSmoothDark") %>% 
+#   addPolygons(data=state_filter, 
+#               fill = T, fillColor = "#181C39", color = "#181C39", fillOpacity=1, weight=3) %>%
+#   addPolygons(data=most_counted_county, weight=1, fillOpacity=.1)
+
+### supplemental data of LA County from  ###
+### https://catalog.data.gov/dataset/tiger-line-shapefile-2019-state-california-primary-and-secondary-roads-state-based-shapefile ### 
+streets <- read_sf('./data/tl_2019_06_prisecroads/tl_2019_06_prisecroads.shp', crs = proj_crs)
+buildings <- read_sf('./data/Building_Footprints-shp/e63e5597-6c0d-464f-8ba1-a7288771575e2020330-1-h41qrd.fsqij.shp', crs = proj_crs)
+###
+
+forest <- 
+  getbb("Angeles National Forest") %>%
+  opq() %>%
+  add_osm_feature(key = "forest") %>%
+  osmdata_sf()
+
+```
+
+
+
+
+
