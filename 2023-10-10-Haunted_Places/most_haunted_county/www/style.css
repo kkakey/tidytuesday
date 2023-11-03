@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC&display=swap');
+
+@font-face {
+    font-family: 'sholp';
+    src: url('shloprg.otf');
+  }
+
+@font-face {
+    font-family: 'fofbb_reg';
+    src: url('fofbb_reg.ttf');
+  }
+
+h1 {
+    font-family: 'fofbb_reg';
+    font-size: 48px;
+    text-align: center;
+}
+
+h2, h3, h4, h5 {
+    font-family: 'sholp';
+}
+
+h3 {
+    font-size: 30px;
+}
+
+h4 {
+    font-size: 25px;
+}
+
+.col-sm-4 {
+    text-align: center;
+}
+
+body {
+    background-color: black;
+    color: darkslateblue; /* text color */
+  }
+
+.button {
+  font-family: 'fofbb_reg';
+  position: absolute;
+  bottom: -40px;
+  right: 0;
+  color: black;
+  background-color: darkslateblue;
+  border-color: darkslateblue;
+}

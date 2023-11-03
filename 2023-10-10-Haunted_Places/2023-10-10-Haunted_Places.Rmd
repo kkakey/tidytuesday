@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 library(sf)
+library(tidycensus)
 library(jsonlite)
 sf_use_s2(FALSE) # https://github.com/r-spatial/sf/issues/1762
 data(county_laea)
@@ -23,55 +24,51 @@ state_laea = st_transform(state_laea, proj_crs)
 
 ```{r}
 get_image_url <- function(location, city) {
-  place <- glue::glue('{location} {city}, California')
+  place <- glue::glue('{location}, California')
   place <- stringr::str_replace_all(place, ' ', '_')
   # search
   res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
                              "piprop=original&list=search&srsearch={place}"))
+  # if no search results, try same search with city
   if (is.null(res$query$search$title[1])) {
-    place <- glue::glue('{location}, California')
-    place <- stringr::str_replace_all(place, ' ', '_')
-    print(glue::glue("place: {place}"))
-    # search
-    r <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
-                             "piprop=original&list=search&srsearch={place}"))
-    print(r)
-    title <- r$query$search$title[1]
-    print(glue::glue("title: {title}"))
-  }
-  # get title
-  title <- res$query$search$title[1]
-  print(glue::glue("title: {title}"))
-  title <- stringr::str_replace_all(title, ' ', '%20')
-  # get image
-  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
-                                 "piprop=original&titles={title}"))
-  # get image url
-  img_url <- img_res$query$pages[[1]]$original$source
-  print(img_url)
-  return(coalesce(img_url, 'NA'))
-}
-```
-
-```{r}
-    place <- glue::glue('Mentryville, California')
+    place <- glue::glue('{location} {city}, California')
     place <- stringr::str_replace_all(place, ' ', '_')
     # search
     res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
                              "piprop=original&list=search&srsearch={place}"))
-
-  print(place)
+  }
+  # if still no search results, try same search without the city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{location}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  }
+    # if still no search results, try same search without the city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{city}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+    # if still no results, continue
+    if (is.null(res$query$search$title[1])) {
+      return(NA)
+    }
+    
+  }
   # get title
   title <- res$query$search$title[1]
   title <- stringr::str_replace_all(title, ' ', '%20')
-  print(glue::glue("title: {title}"))
   # get image
   img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
                                  "piprop=original&titles={title}"))
   # get image url
   img_url <- img_res$query$pages[[1]]$original$source
+  return(coalesce(img_url, NA))
+}
 ```
-
 
 ```{r}
 haunted_places <- 
@@ -105,6 +102,13 @@ haunted_places_county <-
   haunted_places_county %>% 
   filter(GEOID == fips)
 
+# get wiki images of these places
+haunted_places_county <- 
+  haunted_places_county %>% 
+  filter(state_abbrev == 'CA') %>%
+  mutate(img_url = purrr::map2_chr(location, city, ~get_image_url(.x, .y)))
+
+### background geos
 most_counted_county <-
   county_laea %>%
   filter(GEOID == fips)
@@ -132,7 +136,7 @@ state <-
 ########################
 ### write out data
 ########################
-# write_sf(haunted_places_county, "./output_data/haunted_places_county.shp")
+# write_sf(haunted_places_county, "./output_data/haunted_places_county-final.shp")
 # 
 # state_filter <- st_difference(state, most_counted_county)
 # write_sf(state_filter, "./output_data/state_filter.shp")
@@ -140,22 +144,80 @@ state <-
 
 
 ```{r}
-haunted_places_county
+library(leaflet)
+leaflet() %>%
+  addProviderTiles(providers$Stadia.AlidadeSmoothDark,
+                       options = providerTileOptions(noWrap = TRUE))
+```
 
 
-out <- get_image_url('Taft High School Woodland Hills, California')
 
 
-out_url <-
+
+
+Big Yellow House Restaurant
+- Wrong
+
+
+
+
+
+v1
+
+```{r}
+
+get_image_url <- function(location, city) {
+  place <- glue::glue('{location} {city}, California')
+  place <- stringr::str_replace_all(place, ' ', '_')
+  # search
+  res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  
+  # if no search results, try same search without the city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{location}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    r <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+    title <- r$query$search$title[1]
+    
+    # if still no results, continue
+    if (is.null(res$query$search$title[1])) {
+      return(NA)
+    }
+    
+  }
+  # get title
+  title <- res$query$search$title[1]
+  title <- stringr::str_replace_all(title, ' ', '%20')
+  # get image
+  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                                 "piprop=original&titles={title}"))
+  # get image url
+  img_url <- img_res$query$pages[[1]]$original$source
+  return(coalesce(img_url, NA))
+}
+```
+
+
+
+scraps
+
+
+```{r}
+haunted_places_county <- 
   haunted_places_county %>% 
   filter(state_abbrev == 'CA') %>%
   mutate(img_url = purrr::map2_chr(location, city, ~get_image_url(.x, .y)))
 
-  haunted_places_county %>% 
-  filter(state_abbrev == 'CA') %>%
-  .[15,]
+out_url %>%
+  count(ifelse(is.na(img_url), 1, 0))
 
 
+  
+
+  
 
 l <- 
   haunted_places_county %>%
