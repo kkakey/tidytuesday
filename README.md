@@ -9,7 +9,7 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 Shiny application [here](https://kka2120.shinyapps.io/haunted_la_county/)
 
 <p align="center">
-[<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/3f8d76880721f339476c8f2dc7da0b33e28298d4/2023-10-10-Haunted_Places/most_haunted_county/app_example_image.png" width="620" >](https://kka2120.shinyapps.io/haunted_la_county/)
+<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/3f8d76880721f339476c8f2dc7da0b33e28298d4/2023-10-10-Haunted_Places/most_haunted_county/app_example_image.png" width="620">
 </p>
 
 **************************************************************************************************
