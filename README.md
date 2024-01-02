@@ -3,6 +3,17 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+#### 2023-10-10 - [Haunted Places](https://github.com/kkakey/tidytuesday/blob/master/2023-10-10-Haunted_Places/2023-10-10-Haunted_Places.Rmd) 
+- [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-10-10/readme.md)
+
+Shiny application [here](https://kka2120.shinyapps.io/haunted_la_county/)
+
+<p align="center">
+[<img src="https://raw.githubusercontent.com/kkakey/tidytuesday/3f8d76880721f339476c8f2dc7da0b33e28298d4/2023-10-10-Haunted_Places/most_haunted_county/app_example_image.png" width="620" >](https://kka2120.shinyapps.io/haunted_la_county/)
+</p>
+
+**************************************************************************************************
+
 #### 2022-06-25 - [Pride Donations](https://github.com/kkakey/tidytuesday/blob/master/2022-06-07-Pride_Donations/2022-06-07-Pride_Donations.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-06-07)
 
