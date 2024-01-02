@@ -37,10 +37,18 @@ body {
     color: darkslateblue; /* text color */
   }
 
+p{
+  font-family: 'sholp';
+  position: absolute;
+  bottom: -65px;
+  right: 0;
+}
+
 .button {
   font-family: 'fofbb_reg';
   position: absolute;
-  bottom: -40px;
+  padding-bottom: 5px;
+  bottom: -15px;
   right: 0;
   color: black;
   background-color: darkslateblue;

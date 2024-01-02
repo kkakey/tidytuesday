@@ -1,14 +1,21 @@
-library(shiny)
+# library(shiny)
 library(leaflet)
 library(sf)
 library(tidyr)
+library(dplyr)
 
 # Data ------------------------------------------------------------------
 
-haunted_places <- read_sf("../output_data/haunted_places_county-final2.shp")
+haunted_places <- read_sf("output_data/haunted_places_county-final.shp")
 haunted_places$lng <- purrr::map_vec(haunted_places$geometry, ~st_coordinates(.))[,1] %>% as.character()
 haunted_places$lat <- purrr::map_vec(haunted_places$geometry, ~st_coordinates(.))[,2] %>% as.character()
-state_filter <-read_sf("../output_data/state_filter.shp")
+place_desc <- read.csv("output_data/place_desc.csv")
+haunted_places <-
+  haunted_places %>%
+  select(!dscrptn) %>%
+  left_join(place_desc, by="id")
+state_filter <- read_sf("output_data/state_filter.shp")
+place_desc <- read.csv("output_data/place_desc.csv")
 firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
@@ -27,7 +34,6 @@ ui <- fluidPage(
   includeCSS("www/style.css"),
   h1("Haunted Places in Los Angeles County"),
   h2(HTML('LA County is the most haunted county in the United States, with over 300 reported haunted places. Click the ghosts to learn more about each haunted place.')),
-  # h3("LA County is the most haunted county in the United States, with over 300 reported haunted places. Click the ghosts to learn more about each haunted place."),
   fluidRow(
     column(4,
            br(), br(),
@@ -41,8 +47,7 @@ ui <- fluidPage(
            leafletOutput("map", height=700),
            actionButton("reset_button", "Reset view", class="button"),
            br(),
-           p("Data:"),
-           p("amde by")
+           HTML("<p>Data: Snopes Horrors Section<br>Made by <a href='https://github.com/kkakey'>@kkakey</a></p>")
     )
   )
 
@@ -71,7 +76,7 @@ server <- function(input, output, session) {
     click <- input$map_marker_click
     loc <- haunted_places[which(haunted_places$lat == as.character(click$lat) & haunted_places$lng == as.character(click$lng)), ]$locatin[1]
     city <- haunted_places[which(haunted_places$lat == as.character(click$lat) & haunted_places$lng == as.character(click$lng)), ]$city[1]
-    desc <- haunted_places[which(haunted_places$lat == as.character(click$lat) & haunted_places$lng == as.character(click$lng)), ]$dscrptn[1]
+    desc <- haunted_places[which(haunted_places$lat == as.character(click$lat) & haunted_places$lng == as.character(click$lng)), ]$description[1]
     img_url_click <- haunted_places[which(haunted_places$lat == as.character(click$lat) & haunted_places$lng == as.character(click$lng)), ]$img_url[1]
     # https://www.pinterest.com/pin/characters--579979258278605737/
     img_url_click <- ifelse(is.na(img_url_click), 'Halloween Play Sticker by Andrew Onorato for iOS & Android _ GIPHY.gif', img_url_click)
@@ -96,10 +101,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui = ui, server = server)
-
-
-### CSS/make pretty!
-### fix descriptions -- long ones get cut off
-### Add data source
-### Fix some images not matching
-###
