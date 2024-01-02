@@ -1,0 +1,207 @@
+---
+title: "2023-10-10-Haunted_Places"
+output: html_document
+date: "2023-10-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(tidycensus)
+library(jsonlite)
+sf_use_s2(FALSE) # https://github.com/r-spatial/sf/issues/1762
+data(county_laea)
+data(state_laea, state)
+proj_crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+county_laea = st_transform(county_laea, proj_crs)
+state_laea = st_transform(state_laea, proj_crs)
+```
+
+```{r}
+get_image_url <- function(location, city) {
+  place <- glue::glue('{location}, California')
+  place <- stringr::str_replace_all(place, ' ', '_')
+  # search
+  res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  # if no search results, try same search with city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{location} {city}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  }
+  # if still no search results, try same search without the city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{location}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  }
+    # if still no search results, try same search without the city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{city}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+    # if still no results, continue
+    if (is.null(res$query$search$title[1])) {
+      return(NA)
+    }
+    
+  }
+  # get title
+  title <- res$query$search$title[1]
+  title <- stringr::str_replace_all(title, ' ', '%20')
+  # get image
+  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                                 "piprop=original&titles={title}"))
+  # get image url
+  img_url <- img_res$query$pages[[1]]$original$source
+  return(coalesce(img_url, NA))
+}
+```
+
+```{r}
+haunted_places <- 
+  readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-10-10/haunted_places.csv')
+
+haunted_places_county <-
+  haunted_places %>%
+  mutate(longitude = ifelse(is.na(longitude) & is.na(latitude), city_longitude, longitude),
+         latitude = ifelse(is.na(longitude) & is.na(latitude), city_latitude, latitude),
+         # if lat is still missing, replacing both lat/long for city coordinates
+         longitude = ifelse(is.na(latitude), city_longitude, longitude),
+         latitude = ifelse(is.na(latitude), city_latitude, latitude),
+         id = row_number()
+         ) %>%
+  filter(!is.na(longitude)) %>%
+  st_as_sf(x = ., 
+          coords = c("longitude", "latitude"),
+          crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+          ) %>%
+  st_intersection(., county_laea) 
+    
+most_haunted_counties <-
+  haunted_places_county %>%
+  group_by(GEOID) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  head(10)
+  
+fips = most_haunted_counties[1,1]$GEOID
+
+haunted_places_county <- 
+  haunted_places_county %>% 
+  filter(GEOID == fips)
+
+# try and get wiki images of these places
+haunted_places_county <- 
+  haunted_places_county %>% 
+  filter(state_abbrev == 'CA') %>%
+  mutate(img_url = purrr::map2_chr(location, city, ~get_image_url(.x, .y)))
+
+### background geos
+most_counted_county <-
+  county_laea %>%
+  filter(GEOID == fips)
+
+state <-
+  state_laea %>%
+  filter(GEOID == substr(fips, 1,2))
+
+# place descriptions (shapefiles can't hold all the text)
+place_desc <-
+  haunted_places_county %>%
+    as_tibble() %>%
+    select(id, description)
+  
+
+########################
+### write out data
+########################
+# write_sf(haunted_places_county, "./most_haunted_county/output_data/haunted_places_county-final.shp")
+
+# state_filter <- st_difference(state, most_counted_county)
+# write_sf(state_filter, "./most_haunted_county/output_data/state_filter.shp")
+
+# write.csv(place_desc, file = "./most_haunted_county/output_data/place_desc.csv", row.names = F)
+```
+
+
+```{r}
+### some manual URL overrides
+haunted_places_county[haunted_places_county$location=="Mullholand Drive",]$img_url <- "https://upload.wikimedia.org/wikipedia/commons/0/0a/Mulholland_Drive_%285465911964%29.jpg"
+
+haunted_places_county[haunted_places_county$location=="Westwood",]$img_url <- "https://upload.wikimedia.org/wikipedia/commons/9/99/Looking_Up_Westwood_Blvd._from_Westside_Pavillion.JPG"
+
+haunted_places_county[haunted_places_county$location=="Barrymore Estate",]$img_url <- "https://images.mansionglobal.com//im-402577"
+
+haunted_places_county[haunted_places_county$location=="Bennett Home",]$img_url <- NA
+
+haunted_places_county[haunted_places_county$location=="Pinnacle Peaks Restaurant",]$img_url <- NA
+haunted_places_county[haunted_places_county$location=="Thompson Creek Woods",]$img_url <- "https://i0.wp.com/la-explorer.com/wp-content/uploads/IMG_3398-600x800-e1388981014567.jpg?resize=600%2C800"
+haunted_places_county[haunted_places_county$location=="Olive Vista Hospital",]$img_url <- NA
+haunted_places_county[haunted_places_county$location=="Charles Grill",]$img_url <- NA
+haunted_places_county[haunted_places_county$location=="Rosmond",]$img_url <- NA
+haunted_places_county[haunted_places_county$location=="Ganesha High",]$img_url <- "https://imagescdn.homes.com/i2/jcfnK4V-lTRvlu3dj_M4VKGUmE8b4MdnZUM-En4At6k/117/ganesha-high-school-pomona-ca.jpg?p=1"
+
+haunted_places_county[haunted_places_county$location=="Brand Park",]$img_url <- "https://upload.wikimedia.org/wikipedia/commons/a/af/Brand_Park_1.JPG"
+
+
+haunted_places_county[haunted_places_county$location=="Phoenix Inn",]$img_url <- "https://media.timeout.com/images/105303012/image.jpg"
+
+haunted_places_county[haunted_places_county$location=="DeForest Nature Trail",]$img_url <- "https://www.longbeach.gov/globalassets/park/media-library/images/park-and-facilities/parks-and-facilities-directory/deforest-park/deforestwetlands_06-30-18_007.jpg"
+
+haunted_places_county[haunted_places_county$location=="	Le Lycee Francias (up hill campus)",]$img_url <- "https://resources.finalsite.net/images/f_auto,q_auto,t_image_size_2/v1607724261/lyceela/mmuvnvmlkrnvdknbypbt/HS_outside.jpg"
+```
+
+
+
+
+
+v1
+
+```{r}
+
+get_image_url <- function(location, city) {
+  place <- glue::glue('{location} {city}, California')
+  place <- stringr::str_replace_all(place, ' ', '_')
+  # search
+  res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+  
+  # if no search results, try same search without the city
+  if (is.null(res$query$search$title[1])) {
+    place <- glue::glue('{location}, California')
+    place <- stringr::str_replace_all(place, ' ', '_')
+    # search
+    r <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                             "piprop=original&list=search&srsearch={place}"))
+    title <- r$query$search$title[1]
+    
+    # if still no results, continue
+    if (is.null(res$query$search$title[1])) {
+      return(NA)
+    }
+    
+  }
+  # get title
+  title <- res$query$search$title[1]
+  title <- stringr::str_replace_all(title, ' ', '%20')
+  # get image
+  img_res <- fromJSON(glue::glue("http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&",
+                                 "piprop=original&titles={title}"))
+  # get image url
+  img_url <- img_res$query$pages[[1]]$original$source
+  return(coalesce(img_url, NA))
+}
+```
