@@ -3,6 +3,16 @@ My contributions to [TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 **************************************************************************************************
 
+### The data I collected on American Idol ([repo here](https://github.com/kkakey/American_Idol)) was used for week 30, [2024-07-23](https://github.com/rfordatascience/tidytuesday/tree/master/data/2024/2024-07-23), of TidyTuesday! 
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/32500750/232919102-911a4ebb-700e-411e-b43e-571f7d4040cf.png" alt="American Idol logo" width="300" >
+  </p>
+
+Check it out [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2024/2024-07-23) and all the amazing visualizations people made that week at #TidyTuesday on X/Twitter and Mastodon.
+
+**************************************************************************************************
+
 #### 2023-10-10 - [Haunted Places](https://github.com/kkakey/tidytuesday/blob/master/2023-10-10-Haunted_Places/2023-10-10-Haunted_Places.Rmd) 
 - [Data](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-10-10/readme.md)
 
